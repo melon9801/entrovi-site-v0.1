@@ -64,7 +64,7 @@ body::before {
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-/* 確保背景色覆蓋整個頁面 */
+/* === 幾何光帶 === */
 body::after {
   content: '';
   position: fixed;
@@ -74,7 +74,27 @@ body::after {
   height: 100%;
   z-index: -2;
   pointer-events: none;
-  background: var(--ev-bg);
+  background:
+    /* 斜向光帶 1 - 左上到右下 */
+    linear-gradient(120deg, transparent 30%, rgba(236, 102, 36, 0.03) 45%, rgba(236, 102, 36, 0.05) 50%, rgba(236, 102, 36, 0.03) 55%, transparent 70%),
+    /* 斜向光帶 2 - 右上到左下 */
+    linear-gradient(-120deg, transparent 35%, rgba(236, 102, 36, 0.02) 50%, rgba(236, 102, 36, 0.04) 55%, rgba(236, 102, 36, 0.02) 60%, transparent 75%),
+    /* 水平光帶 */
+    linear-gradient(0deg, transparent 48%, rgba(255, 255, 255, 0.02) 50%, transparent 52%),
+    /* 垂直光帶 */
+    linear-gradient(90deg, transparent 49%, rgba(255, 255, 255, 0.015) 50%, transparent 51%);
+  animation: light-beam 20s ease-in-out infinite;
+}
+
+@keyframes light-beam {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translateX(0) translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(30px) translateY(-20px);
+  }
 }
 
 a { color: inherit; text-decoration: none; }
@@ -872,40 +892,45 @@ function Contact({ t }) {
             </ul>
           </div>
 
-          <form className="ev-form" onSubmit={submit} noValidate>
+          <form
+            className="ev-form"
+            action="https://formspree.io/f/YOUR_FORM_ID"
+            method="POST"
+            noValidate
+          >
             <div className="ev-form-row two">
               <Field label={f.name} required err={errors.name}>
-                <input type="text" value={vals.name} onChange={(e) => update("name", e.target.value)} />
+                <input type="text" name="name" value={vals.name} onChange={(e) => update("name", e.target.value)} />
               </Field>
               <Field label={f.company}>
-                <input type="text" value={vals.company} onChange={(e) => update("company", e.target.value)} />
+                <input type="text" name="company" value={vals.company} onChange={(e) => update("company", e.target.value)} />
               </Field>
             </div>
             <div className="ev-form-row two">
               <Field label={f.email} required err={errors.email}>
-                <input type="email" value={vals.email} onChange={(e) => update("email", e.target.value)} />
+                <input type="email" name="email" value={vals.email} onChange={(e) => update("email", e.target.value)} />
               </Field>
               <Field label={f.phone}>
-                <input type="tel" value={vals.phone} onChange={(e) => update("phone", e.target.value)} />
+                <input type="tel" name="phone" value={vals.phone} onChange={(e) => update("phone", e.target.value)} />
               </Field>
             </div>
             <Field label={f.interest}>
-              <select value={vals.interest} onChange={(e) => update("interest", e.target.value)}>
+              <select name="interest" value={vals.interest} onChange={(e) => update("interest", e.target.value)}>
                 <option value="">—</option>
                 {t.contact.interestOptions.map((o) => <option key={o} value={o}>{o}</option>)}
               </select>
             </Field>
             <Field label={f.message} required err={errors.message}>
-              <textarea rows="5" value={vals.message} onChange={(e) => update("message", e.target.value)} />
+              <textarea name="message" rows="5" value={vals.message} onChange={(e) => update("message", e.target.value)} />
             </Field>
             <details className="ev-form-more">
               <summary>+ {t.contact.fields.notes} / {t.contact.fields.budget} / {t.contact.fields.timeline}</summary>
               <div className="ev-form-row two">
                 <Field label={f.budget}>
-                  <input type="text" value={vals.budget} onChange={(e) => update("budget", e.target.value)} />
+                  <input type="text" name="budget" value={vals.budget} onChange={(e) => update("budget", e.target.value)} />
                 </Field>
                 <Field label={f.timeline}>
-                  <input type="text" value={vals.timeline} onChange={(e) => update("timeline", e.target.value)} />
+                  <input type="text" name="timeline" value={vals.timeline} onChange={(e) => update("timeline", e.target.value)} />
                 </Field>
               </div>
               <Field label={f.haveData}>
@@ -919,7 +944,7 @@ function Contact({ t }) {
                 </div>
               </Field>
               <Field label={f.notes}>
-                <textarea rows="3" value={vals.notes} onChange={(e) => update("notes", e.target.value)} />
+                <textarea name="notes" rows="3" value={vals.notes} onChange={(e) => update("notes", e.target.value)} />
               </Field>
             </details>
             <div className="ev-form-submit">

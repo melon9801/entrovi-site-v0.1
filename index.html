@@ -61,17 +61,85 @@ body::before {
   height: 100%;
   z-index: -1;
   pointer-events: none;
-  opacity: 0.3;
+  opacity: 0.08;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
-/* === Layout === */.ev-orb-3 {
+/* === 幾何光帶 === */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  pointer-events: none;
+  background:
+    /* 斜向光帶 1 - 左上到右下 */
+    linear-gradient(120deg, transparent 30%, rgba(236, 102, 36, 0.03) 45%, rgba(236, 102, 36, 0.05) 50%, rgba(236, 102, 36, 0.03) 55%, transparent 70%),
+    /* 斜向光帶 2 - 右上到左下 */
+    linear-gradient(-120deg, transparent 35%, rgba(236, 102, 36, 0.02) 50%, rgba(236, 102, 36, 0.04) 55%, rgba(236, 102, 36, 0.02) 60%, transparent 75%),
+    /* 水平光帶 */
+    linear-gradient(0deg, transparent 48%, rgba(255, 255, 255, 0.02) 50%, transparent 52%),
+    /* 垂直光帶 */
+    linear-gradient(90deg, transparent 49%, rgba(255, 255, 255, 0.015) 50%, transparent 51%);
+  animation: light-beam 20s ease-in-out infinite;
+}
+
+@keyframes light-beam {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translateX(0) translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateX(30px) translateY(-20px);
+  }
+}
+
+/* === Layout === */
+.ev-container {
+  max-width: var(--ev-maxw);
+  margin: 0 auto;
+  padding: 0 var(--ev-pad);
+  position: relative;
+  z-index: 1;
+}
+
+.ev-section {
+  padding: var(--ev-section-y) 0;
+  border-top: 1px solid var(--ev-line);
+  position: relative;
+}
+
+.ev-section:first-of-type { border-top: 0; }
+
+/* === Orb Animation === */
+.ev-orb-1, .ev-orb-2, .ev-orb-3 {
+  position: absolute;
   width: 280px;
   height: 280px;
   background: radial-gradient(circle, rgba(236, 102, 36, 0.22) 0%, transparent 70%);
+  border-radius: 50%;
+}
+
+.ev-orb-1 {
+  bottom: 20%;
+  left: 20%;
+  animation: orb-float-1 20s ease-in-out infinite;
+}
+
+.ev-orb-2 {
   bottom: 15%;
-  left: 35%;
-  animation: orb-float-3 20s ease-in-out infinite;
+  left: 45%;
+  animation: orb-float-2 18s ease-in-out infinite;
+}
+
+.ev-orb-3 {
+  bottom: 10%;
+  left: 65%;
+  animation: orb-float-3 22s ease-in-out infinite;
 }
 
 @keyframes orb-float-1 {
@@ -120,23 +188,6 @@ input, textarea, select { font-family: inherit; }
 ::selection { background: var(--ev-fg); color: var(--ev-bg); }
 
 html { scroll-behavior: smooth; }
-
-/* === Layout === */
-.ev-container {
-  max-width: var(--ev-maxw);
-  margin: 0 auto;
-  padding: 0 var(--ev-pad);
-  position: relative;
-  z-index: 1;
-}
-
-.ev-section {
-  padding: var(--ev-section-y) 0;
-  border-top: 1px solid var(--ev-line);
-  position: relative;
-}
-
-.ev-section:first-of-type { border-top: 0; }
 
 /* === Nav === */
 .ev-nav {
