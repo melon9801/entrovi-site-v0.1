@@ -1,0 +1,997 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EntroVi — Contact</title>
+<meta name="description" content="Contact EntroVi for AI engineering solutions. Let's discuss your project." />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&family=Instrument+Serif&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500&family=VT323&display=swap" rel="stylesheet">
+
+<style>
+/* EntroVi — Design System */
+
+:root {
+  --ev-bg: #08090b;
+  --ev-bg-2: #0d0f12;
+  --ev-bg-3: #14171c;
+  --ev-line: rgba(255, 255, 255, 0.08);
+  --ev-line-2: rgba(236, 102, 36, 0.25);
+  --ev-fg: #f5f5f4;
+  --ev-fg-2: rgba(245, 245, 244, 0.78);
+  --ev-fg-3: rgba(245, 245, 244, 0.52);
+  --ev-fg-4: rgba(245, 245, 244, 0.32);
+  --ev-accent: #ec6624;
+
+  --ev-font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, "Noto Sans TC", system-ui, sans-serif;
+  --ev-font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --ev-font-display: var(--ev-font-sans);
+
+  --ev-radius: 2px;
+  --ev-radius-lg: 4px;
+  --ev-maxw: 1240px;
+  --ev-pad: clamp(20px, 4vw, 56px);
+  --ev-section-y: clamp(80px, 10vw, 140px);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--ev-bg);
+  color: var(--ev-fg);
+  font-family: var(--ev-font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 極簡噪點紋理 */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.08;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* 確保背景色覆蓋整個頁面 */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -2;
+  pointer-events: none;
+  background: var(--ev-bg);
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+input, textarea, select { font-family: inherit; }
+
+::selection { background: var(--ev-fg); color: var(--ev-bg); }
+
+html { scroll-behavior: smooth; }
+
+/* === Layout === */
+.ev-container {
+  max-width: var(--ev-maxw);
+  margin: 0 auto;
+  padding: 0 var(--ev-pad);
+  position: relative;
+  z-index: 1;
+}
+
+.ev-section {
+  padding: var(--ev-section-y) 0;
+  border-top: 1px solid var(--ev-line);
+  position: relative;
+}
+
+.ev-section:first-of-type { border-top: 0; }
+
+/* === Nav === */
+.ev-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(8, 9, 11, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+  transition: border-color .2s ease, background .2s ease;
+}
+.ev-nav.is-scrolled {
+  border-bottom-color: var(--ev-line);
+  background: rgba(8, 9, 11, 0.85);
+}
+.ev-nav-inner {
+  max-width: var(--ev-maxw);
+  margin: 0 auto;
+  padding: 14px var(--ev-pad);
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.ev-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--ev-font-mono);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  font-size: 15px;
+}
+.ev-logo-mark { display: inline-flex; opacity: 0.95; width: 50px; height: 50px; }
+.ev-logo-text { letter-spacing: 0.04em; }
+
+.ev-nav-links {
+  display: flex;
+  gap: 28px;
+  margin: 0 auto 0 16px;
+  padding: 0;
+  list-style: none;
+}
+.ev-nav-links a {
+  font-size: 13.5px;
+  color: var(--ev-fg-2);
+  letter-spacing: 0.01em;
+  transition: color .15s ease;
+}
+.ev-nav-links a:hover { color: var(--ev-fg); }
+
+.ev-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.ev-lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ev-font-mono);
+  font-size: 12px;
+  color: var(--ev-fg-3);
+}
+.ev-lang-btn {
+  background: none;
+  border: 0;
+  color: inherit;
+  padding: 4px 2px;
+  letter-spacing: 0.04em;
+}
+.ev-lang-btn.is-active { color: var(--ev-fg); }
+.ev-lang-sep { color: var(--ev-fg-4); }
+
+.ev-burger {
+  display: none;
+  background: none;
+  border: 1px solid var(--ev-line);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ev-radius);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.ev-burger span { display: block; width: 14px; height: 1px; background: var(--ev-fg); }
+.ev-nav-mobile { display: none; }
+
+/* === Buttons === */
+.ev-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 32px;
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-radius: 999px;
+  border: none;
+  transition: all .35s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+.ev-btn-sm { padding: 10px 18px; font-size: 13px; border-radius: 16px; }
+.ev-btn-lg { padding: 20px 36px; font-size: 17px; border-radius: 24px; }
+
+.ev-btn-primary {
+  background: linear-gradient(135deg, #ec6624 0%, #ff7a4a 50%, #ec6624 100%);
+  background-size: 200% 200%;
+  color: #fff;
+  box-shadow:
+    0 4px 20px rgba(236, 102, 36, 0.35),
+    0 2px 8px rgba(236, 102, 36, 0.2) inset;
+}
+.ev-btn-primary:hover {
+  background-position: 100% 0;
+  transform: translateY(-3px);
+  box-shadow:
+    0 8px 32px rgba(236, 102, 36, 0.5),
+    0 4px 12px rgba(236, 102, 36, 0.3) inset;
+}
+.ev-btn-primary:active {
+  transform: translateY(-1px);
+}
+.ev-btn-primary:disabled { opacity: 0.6; cursor: progress; }
+
+.ev-btn-ghost {
+  background: rgba(236, 102, 36, 0.08);
+  color: #ec6624;
+  border: 1.5px solid rgba(236, 102, 36, 0.35);
+  backdrop-filter: blur(8px);
+}
+.ev-btn-ghost:hover {
+  background: rgba(236, 102, 36, 0.15);
+  border-color: rgba(236, 102, 36, 0.55);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(236, 102, 36, 0.2);
+}
+
+.ev-btn-arrow {
+  display: inline-block;
+  transition: transform .25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ev-btn:hover .ev-btn-arrow { transform: translateX(5px); }
+
+/* === Contact Page === */
+.ev-contact-page {
+  min-height: 100vh;
+  padding: clamp(60px, 8vw, 100px) 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ev-contact-container {
+  max-width: var(--ev-maxw);
+  width: 100%;
+  padding: 0 var(--ev-pad);
+}
+
+.ev-contact-header {
+  text-align: center;
+  margin-bottom: clamp(48px, 6vw, 72px);
+}
+
+.ev-contact-kicker {
+  font-family: var(--ev-font-mono);
+  font-size: 13px;
+  color: var(--ev-accent);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  font-weight: 500;
+}
+
+.ev-contact-title {
+  font-family: var(--ev-font-display);
+  font-size: clamp(32px, 5vw, 52px);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 20px;
+  color: var(--ev-fg);
+}
+
+.ev-contact-sub {
+  font-size: 17px;
+  line-height: 1.65;
+  color: var(--ev-fg-2);
+  max-width: 540px;
+  margin: 0 auto;
+}
+
+.ev-contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: clamp(48px, 6vw, 80px);
+  align-items: start;
+}
+
+.ev-contact-info {
+  padding: clamp(32px, 4vw, 44px);
+  background: var(--ev-bg-2);
+  border: 1px solid var(--ev-line);
+  border-radius: var(--ev-radius-lg);
+}
+
+.ev-contact-info-head {
+  font-family: var(--ev-font-mono);
+  font-size: 11px;
+  color: var(--ev-fg-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 28px;
+}
+
+.ev-contact-meta {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ev-contact-meta li {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.ev-meta-l {
+  font-family: var(--ev-font-mono);
+  font-size: 11px;
+  color: var(--ev-fg-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.ev-meta-v {
+  font-size: 15px;
+  color: var(--ev-fg);
+  line-height: 1.6;
+}
+
+/* === Form === */
+.ev-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.ev-form-row {
+  display: flex;
+  gap: 22px;
+}
+
+.ev-form-row.two {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+}
+
+.ev-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+
+.ev-field-l {
+  font-family: var(--ev-font-mono);
+  font-size: 11px;
+  color: var(--ev-fg-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ev-req {
+  color: var(--ev-accent);
+}
+
+.ev-field input,
+.ev-field textarea,
+.ev-field select {
+  background: var(--ev-bg-2);
+  border: 1px solid var(--ev-line);
+  border-radius: var(--ev-radius);
+  padding: 14px 16px;
+  font-size: 15px;
+  color: var(--ev-fg);
+  font-family: var(--ev-font-sans);
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+
+.ev-field input:focus,
+.ev-field textarea:focus,
+.ev-field select:focus {
+  outline: none;
+  border-color: var(--ev-accent);
+  box-shadow: 0 0 0 3px rgba(236, 102, 36, 0.15);
+}
+
+.ev-field textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.ev-field.has-err input,
+.ev-field.has-err textarea {
+  border-color: #ff4757;
+}
+
+.ev-err {
+  font-size: 12px;
+  color: #ff4757;
+  margin-top: -4px;
+}
+
+.ev-form-submit {
+  margin-top: 8px;
+}
+
+/* === Contact Success === */
+.ev-contact-success {
+  text-align: center;
+  padding: clamp(60px, 8vw, 90px) clamp(32px, 5vw, 50px);
+  background: var(--ev-bg-2);
+  border: 1px solid var(--ev-line);
+  border-radius: var(--ev-radius-lg);
+}
+
+.ev-success-mark {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(74, 222, 128, 0.15);
+  border-radius: 50%;
+}
+
+.ev-success-mark svg {
+  color: #4ade80;
+}
+
+.ev-contact-success h2 {
+  font-family: var(--ev-font-display);
+  font-size: 26px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 14px;
+  color: var(--ev-fg);
+}
+
+.ev-contact-success p {
+  font-size: 15.5px;
+  color: var(--ev-fg-2);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* === Form More === */
+.ev-form-more {
+  border-top: 1px solid var(--ev-line);
+  padding-top: 20px;
+}
+
+.ev-form-more summary {
+  font-family: var(--ev-font-mono);
+  font-size: 12px;
+  color: var(--ev-fg-2);
+  cursor: pointer;
+  list-style: none;
+  margin-bottom: 16px;
+  transition: color .2s ease;
+}
+
+.ev-form-more summary::-webkit-details-marker {
+  display: none;
+}
+
+.ev-form-more summary:hover {
+  color: var(--ev-fg);
+}
+
+.ev-radio-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.ev-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  background: var(--ev-bg);
+  border: 1px solid var(--ev-line);
+  border-radius: var(--ev-radius);
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.ev-radio:hover {
+  border-color: rgba(236, 102, 36, 0.4);
+}
+
+.ev-radio.is-on {
+  background: rgba(236, 102, 36, 0.15);
+  border-color: var(--ev-accent);
+}
+
+.ev-radio input {
+  display: none;
+}
+
+.ev-radio span {
+  font-size: 14px;
+  color: var(--ev-fg-2);
+}
+
+.ev-radio.is-on span {
+  color: var(--ev-fg);
+}
+
+/* === Footer === */
+.ev-footer {
+  border-top: 1px solid var(--ev-line);
+  padding: 40px 0;
+  margin-top: 80px;
+}
+
+.ev-footer-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--ev-line);
+  margin-bottom: 24px;
+}
+
+.ev-footer-tag {
+  margin: 12px 0 0;
+  color: var(--ev-fg-3);
+  font-size: 13px;
+}
+
+.ev-footer-contact {
+  font-family: var(--ev-font-mono);
+  font-size: 13px;
+  color: var(--ev-fg-2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: right;
+}
+
+.ev-footer-contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.ev-footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--ev-font-mono);
+  font-size: 11.5px;
+  color: var(--ev-fg-3);
+  letter-spacing: 0.04em;
+}
+
+/* === Responsive === */
+@media (max-width: 1024px) {
+  .ev-contact-grid {
+    grid-template-columns: 1fr;
+    gap: 48px;
+  }
+}
+
+@media (max-width: 720px) {
+  .ev-nav-links { display: none; }
+  .ev-burger {
+    display: inline-flex;
+  }
+  .ev-nav-mobile {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--ev-line);
+    padding: 12px var(--ev-pad);
+    gap: 4px;
+  }
+  .ev-nav-mobile a {
+    padding: 12px 0;
+    color: var(--ev-fg-2);
+    border-bottom: 1px solid var(--ev-line);
+  }
+  .ev-nav-right {
+    gap: 12px;
+  }
+  .ev-lang { display: none; }
+  .ev-contact-page {
+    padding: clamp(40px, 6vw, 60px) 0;
+  }
+  .ev-contact-grid {
+    gap: 32px;
+  }
+  .ev-contact-info {
+    padding: 28px;
+  }
+  .ev-form-row.two {
+    grid-template-columns: 1fr;
+  }
+  .ev-footer-top {
+    flex-direction: column;
+    gap: 24px;
+  }
+  .ev-footer-contact {
+    text-align: left;
+  }
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+const I18N = {
+  en: {
+    nav: {
+      services: "Services",
+      process: "Process",
+      why: "Our Edge",
+      contact: "Contact",
+      cta: "Let's talk",
+    },
+    contact: {
+      kicker: "Get in Touch",
+      title: "Let's talk.",
+      sub: "Tell us about your project. We'll get back to you within 2 business days.",
+      fields: {
+        name: "Name",
+        company: "Company",
+        email: "Email",
+        phone: "Phone",
+        interest: "Service of interest",
+        message: "Project description",
+        budget: "Budget range (optional)",
+        timeline: "Target timeline (optional)",
+        haveData: "Existing data or imagery",
+        notes: "Anything else",
+        submit: "Send enquiry",
+        sending: "Sending...",
+        sent: "Received. We'll be in touch within 2 business days.",
+        required: "Required",
+        invalidEmail: "Enter a valid email",
+      },
+      interestOptions: [
+        "Model training & development",
+        "Image recognition / machine vision",
+        "Edge AI system",
+        "RAG knowledge base",
+        "Deployment & integration",
+        "Not sure yet",
+      ],
+      haveOptions: ["Yes", "Some", "No", "Need to discuss"],
+    },
+    footer: {
+      tagline: "Taipei, Taiwan",
+      copy: "© 2026 EntroVi Ltd. All rights reserved.",
+      contactLine: "yen@entrovi.com",
+    },
+  },
+  zh: {
+    nav: {
+      services: "服務",
+      process: "流程",
+      why: "我們的優勢",
+      contact: "聯絡",
+      cta: "聯絡我們",
+    },
+    contact: {
+      kicker: "聯絡我們",
+      title: "讓我們談談。",
+      sub: "告訴我們你的需求。兩個工作日內回覆。",
+      fields: {
+        name: "姓名",
+        company: "公司 / 單位",
+        email: "Email",
+        phone: "電話",
+        interest: "想了解的服務",
+        message: "專案需求描述",
+        budget: "預算範圍 (選填)",
+        timeline: "預計導入時間 (選填)",
+        haveData: "是否已有資料或影像",
+        notes: "其他補充",
+        submit: "送出詢問",
+        sending: "送出中...",
+        sent: "已收到。兩個工作日內聯繫。",
+        required: "必填",
+        invalidEmail: "請輸入有效 Email",
+      },
+      interestOptions: [
+        "模型訓練與開發",
+        "影像辨識 / 機器視覺",
+        "邊緣 AI 系統",
+        "RAG 知識庫",
+        "部署與整合",
+        "尚未確定",
+      ],
+      haveOptions: ["有", "部分有", "沒有", "需討論"],
+    },
+    footer: {
+      tagline: "Taipei, Taiwan",
+      copy: "© 2026 EntroVi Ltd. 版權所有。",
+      contactLine: "yen@entrovi.com",
+    },
+  },
+};
+
+function Nav({ t, lang, onLang }) {
+  const [scrolled, setScrolled] = React.useState(false);
+
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const links = [
+    { id: "services", label: t.nav.services, href: "index.html#services" },
+    { id: "process", label: t.nav.process, href: "index.html#process" },
+    { id: "why", label: t.nav.why, href: "index.html#why" },
+  ];
+
+  return (
+    <nav className={`ev-nav ${scrolled ? "is-scrolled" : ""}`}>
+      <div className="ev-nav-inner">
+        <a href="EntroVi.html" className="ev-logo" aria-label="EntroVi home">
+          <img src="entrovi-logo.png" alt="EntroVi" style={{ width: 96, height: 96, objectFit: 'contain' }} />
+        </a>
+        <ul className="ev-nav-links">
+          {links.map((l) => (
+            <li key={l.id}>
+              <a href={l.href}>{l.label}</a>
+            </li>
+          ))}
+        </ul>
+        <div className="ev-nav-right">
+          <div className="ev-lang">
+            <button className={`ev-lang-btn ${lang === "en" ? "is-active" : ""}`} onClick={() => onLang("en")}>EN</button>
+            <span className="ev-lang-sep">/</span>
+            <button className={`ev-lang-btn ${lang === "zh" ? "is-active" : ""}`} onClick={() => onLang("zh")}>中</button>
+          </div>
+          <button className={`ev-burger`} aria-label="Toggle menu">
+            <span></span><span></span>
+          </button>
+        </div>
+      </div>
+    </nav>
+  );
+}
+
+function Contact({ t }) {
+  const f = t.contact.fields;
+  const [vals, setVals] = React.useState({
+    name: "", company: "", email: "", phone: "",
+    interest: "", message: "", budget: "", timeline: "", haveData: "", notes: ""
+  });
+  const [errors, setErrors] = React.useState({});
+  const [status, setStatus] = React.useState("idle");
+
+  const update = (k, v) => {
+    setVals((s) => ({ ...s, [k]: v }));
+    if (errors[k]) setErrors((e) => { const n = { ...e }; delete n[k]; return n; });
+  };
+
+  const validate = () => {
+    const e = {};
+    if (!vals.name.trim()) e.name = f.required;
+    if (!vals.email.trim()) e.email = f.required;
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(vals.email)) e.email = f.invalidEmail;
+    if (!vals.message.trim()) e.message = f.required;
+    return e;
+  };
+
+  const submit = (ev) => {
+    ev.preventDefault();
+    const e = validate();
+    setErrors(e);
+    if (Object.keys(e).length) return;
+    setStatus("sending");
+    setTimeout(() => setStatus("sent"), 900);
+  };
+
+  if (status === "sent") {
+    return (
+      <section className="ev-contact-page">
+        <div className="ev-contact-container">
+          <div className="ev-contact-success">
+            <div className="ev-success-mark">
+              <svg viewBox="0 0 48 48" width="48" height="48">
+                <path d="M10 25 L20 35 L38 14" fill="none" stroke="currentColor" strokeWidth="1.5" />
+              </svg>
+            </div>
+            <h2>{f.sent}</h2>
+            <p>{t.footer.contactLine}</p>
+            <div style={{ marginTop: '32px' }}>
+              <a href="EntroVi.html" className="ev-btn ev-btn-ghost">
+                ← Back to home
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="ev-contact-page">
+      <div className="ev-contact-container">
+        <header className="ev-contact-header">
+          <div className="ev-contact-kicker">{t.contact.kicker}</div>
+          <h1 className="ev-contact-title">{t.contact.title}</h1>
+          <p className="ev-contact-sub">{t.contact.sub}</p>
+        </header>
+
+        <div className="ev-contact-grid">
+          <div className="ev-contact-info">
+            <div className="ev-contact-info-head">Contact Information</div>
+            <ul className="ev-contact-meta">
+              <li>
+                <span className="ev-meta-l">EMAIL</span>
+                <span className="ev-meta-v">{t.footer.contactLine}</span>
+              </li>
+              <li>
+                <span className="ev-meta-l">LOCATION</span>
+                <span className="ev-meta-v">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--ev-accent)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                      <circle cx="12" cy="10" r="3" />
+                    </svg>
+                    <span>Taipei, Taiwan</span>
+                  </div>
+                  <span>14 F.-1 NO.415, Sec.4 Xinyi RD., Xinyi Dist</span>
+                </span>
+              </li>
+              <li>
+                <span className="ev-meta-l">RESPONSE</span>
+                <span className="ev-meta-v">≤ 2 business days</span>
+              </li>
+            </ul>
+          </div>
+
+          <form className="ev-form" onSubmit={submit} noValidate>
+            <div className="ev-form-row two">
+              <Field label={f.name} required err={errors.name}>
+                <input type="text" value={vals.name} onChange={(e) => update("name", e.target.value)} />
+              </Field>
+              <Field label={f.company}>
+                <input type="text" value={vals.company} onChange={(e) => update("company", e.target.value)} />
+              </Field>
+            </div>
+            <div className="ev-form-row two">
+              <Field label={f.email} required err={errors.email}>
+                <input type="email" value={vals.email} onChange={(e) => update("email", e.target.value)} />
+              </Field>
+              <Field label={f.phone}>
+                <input type="tel" value={vals.phone} onChange={(e) => update("phone", e.target.value)} />
+              </Field>
+            </div>
+            <Field label={f.interest}>
+              <select value={vals.interest} onChange={(e) => update("interest", e.target.value)}>
+                <option value="">—</option>
+                {t.contact.interestOptions.map((o) => <option key={o} value={o}>{o}</option>)}
+              </select>
+            </Field>
+            <Field label={f.message} required err={errors.message}>
+              <textarea rows="5" value={vals.message} onChange={(e) => update("message", e.target.value)} />
+            </Field>
+            <details className="ev-form-more">
+              <summary>+ {t.contact.fields.notes} / {t.contact.fields.budget} / {t.contact.fields.timeline}</summary>
+              <div className="ev-form-row two">
+                <Field label={f.budget}>
+                  <input type="text" value={vals.budget} onChange={(e) => update("budget", e.target.value)} />
+                </Field>
+                <Field label={f.timeline}>
+                  <input type="text" value={vals.timeline} onChange={(e) => update("timeline", e.target.value)} />
+                </Field>
+              </div>
+              <Field label={f.haveData}>
+                <div className="ev-radio-row">
+                  {t.contact.haveOptions.map((o) => (
+                    <label key={o} className={`ev-radio ${vals.haveData === o ? "is-on" : ""}`}>
+                      <input type="radio" name="haveData" value={o} checked={vals.haveData === o} onChange={(e) => update("haveData", e.target.value)} />
+                      <span>{o}</span>
+                    </label>
+                  ))}
+                </div>
+              </Field>
+              <Field label={f.notes}>
+                <textarea rows="3" value={vals.notes} onChange={(e) => update("notes", e.target.value)} />
+              </Field>
+            </details>
+            <div className="ev-form-submit">
+              <button type="submit" className="ev-btn ev-btn-primary ev-btn-lg" disabled={status === "sending"}>
+                <span>{status === "sending" ? f.sending : f.submit}</span>
+                <span className="ev-btn-arrow">→</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Field({ label, required, err, children }) {
+  return (
+    <label className={`ev-field ${err ? "has-err" : ""}`}>
+      <span className="ev-field-l">
+        {label}{required && <span className="ev-req">*</span>}
+        {err && <span className="ev-err">{err}</span>}
+      </span>
+      {children}
+    </label>
+  );
+}
+
+function Footer({ t }) {
+  return (
+    <footer className="ev-footer">
+      <div className="ev-container">
+        <div className="ev-footer-top">
+          <div>
+            <img src="entrovi-logo.png" alt="EntroVi" style={{ width: 96, height: 96, objectFit: 'contain' }} />
+            <p className="ev-footer-tag">{t.footer.tagline}</p>
+          </div>
+          <div className="ev-footer-contact">
+            <div className="ev-footer-contact-row">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px', color: 'var(--ev-accent)' }}>
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <span>Taipei, Taiwan</span>
+            </div>
+            <div className="ev-footer-contact-row">
+              <span>14 F.-1 NO.415, Sec.4 Xinyi RD., Xinyi Dist</span>
+            </div>
+          </div>
+        </div>
+        <div className="ev-footer-bottom">
+          <span>{t.footer.copy}</span>
+          <span>v0.1</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+function App() {
+  const [lang, setLang] = React.useState("en");
+  const t = I18N[lang];
+
+  return (
+    <React.Fragment>
+      <Nav t={t} lang={lang} onLang={setLang} />
+      <Contact t={t} />
+      <Footer t={t} />
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

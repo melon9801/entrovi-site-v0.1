@@ -1,0 +1,2634 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>EntroVi · AI engineering for real-world operations</title>
+<meta name="description" content="EntroVi 熵維科技有限公司 — AI model training, image recognition, machine vision, edge AI deployment, RAG knowledge bases and system integration for real operating environments." />
+<meta name="keywords" content="EntroVi, 熵維科技，AI, model training, image recognition, machine vision, edge AI, RAG, 模型訓練，影像辨識，邊緣 AI" />
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@400;500;600&family=Instrument+Serif&family=JetBrains+Mono:wght@400;500&family=Noto+Sans+TC:wght@400;500&family=VT323&display=swap" rel="stylesheet">
+
+<style>
+/* EntroVi — Design System */
+
+:root {
+  --ev-bg: #3a3a3a;
+  --ev-bg-2: #4a4a4a;
+  --ev-bg-3: #5a5a5a;
+  --ev-line: rgba(255, 255, 255, 0.08);
+  --ev-line-2: rgba(236, 102, 36, 0.25);
+  --ev-fg: #fafafa;
+  --ev-fg-2: rgba(250, 250, 250, 0.78);
+  --ev-fg-3: rgba(250, 250, 250, 0.52);
+  --ev-fg-4: rgba(250, 250, 250, 0.32);
+  --ev-accent: #ec6624;
+
+  --ev-font-sans: "Inter", "Helvetica Neue", Helvetica, Arial, "Noto Sans TC", system-ui, sans-serif;
+  --ev-font-mono: "JetBrains Mono", "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+  --ev-font-display: var(--ev-font-sans);
+
+  --ev-radius: 2px;
+  --ev-radius-lg: 4px;
+  --ev-maxw: 1240px;
+  --ev-pad: clamp(20px, 4vw, 56px);
+  --ev-section-y: clamp(80px, 10vw, 140px);
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  background: var(--ev-bg);
+  color: var(--ev-fg);
+  font-family: var(--ev-font-sans);
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* 極簡噪點紋理 */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.3;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* === Layout === */.ev-orb-3 {
+  width: 280px;
+  height: 280px;
+  background: radial-gradient(circle, rgba(236, 102, 36, 0.22) 0%, transparent 70%);
+  bottom: 15%;
+  left: 35%;
+  animation: orb-float-3 20s ease-in-out infinite;
+}
+
+@keyframes orb-float-1 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(60px, -40px) scale(1.2); }
+}
+
+@keyframes orb-float-2 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(-50px, 30px) scale(1.1); }
+}
+
+@keyframes orb-float-3 {
+  0%, 100% { transform: translate(0, 0) scale(1); }
+  50% { transform: translate(40px, -50px) scale(1.15); }
+}
+
+/* 浮動粒子 */
+.ev-particles {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.ev-particle {
+  position: absolute;
+  width: 5px;
+  height: 5px;
+  background: rgba(236, 102, 36, 0.85);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(236, 102, 36, 0.9);
+  animation: particle-rise 10s linear infinite;
+}
+
+@keyframes particle-rise {
+  0% { transform: translateY(100vh) scale(0); opacity: 0; }
+  10% { opacity: 0.9; }
+  90% { opacity: 0.9; }
+  100% { transform: translateY(-100px) scale(1); opacity: 0; }
+}
+
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+input, textarea, select { font-family: inherit; }
+
+::selection { background: var(--ev-fg); color: var(--ev-bg); }
+
+html { scroll-behavior: smooth; }
+
+/* === Layout === */
+.ev-container {
+  max-width: var(--ev-maxw);
+  margin: 0 auto;
+  padding: 0 var(--ev-pad);
+  position: relative;
+  z-index: 1;
+}
+
+.ev-section {
+  padding: var(--ev-section-y) 0;
+  border-top: 1px solid var(--ev-line);
+  position: relative;
+}
+
+.ev-section:first-of-type { border-top: 0; }
+
+/* === Nav === */
+.ev-nav {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(8, 9, 11, 0.6);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid transparent;
+  transition: border-color .2s ease, background .2s ease;
+}
+.ev-nav.is-scrolled {
+
+/* === Hero Right Side Animation === */
+.ev-hero-visual-wrap {
+  position: relative;
+  width: 100%;
+  max-width: 520px;
+  aspect-ratio: 1 / 1;
+  margin: 40px auto 0;
+}
+
+.ev-hero-visual {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ev-hero-visual svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Animated geometric elements */
+@keyframes float-rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+}
+
+@keyframes orbit {
+  0% { transform: rotate(0deg) translateX(60px) rotate(0deg); }
+  100% { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
+}
+
+.ev-orbit-ring {
+  animation: float-rotate 20s linear infinite;
+}
+
+.ev-orbit-dot {
+  animation: orbit 8s ease-in-out infinite;
+}
+
+.ev-pulse-circle {
+  animation: pulse-glow 3s ease-in-out infinite;
+}
+
+.ev-pulse-circle:nth-child(2) {
+  animation-delay: 0.5s;
+}
+
+.ev-pulse-circle:nth-child(3) {
+  animation-delay: 1s;
+}
+  border-bottom-color: var(--ev-line);
+  background: rgba(8, 9, 11, 0.85);
+}
+.ev-nav-inner {
+  max-width: var(--ev-maxw);
+  margin: 0 auto;
+  padding: 14px var(--ev-pad);
+  display: flex;
+  align-items: center;
+  gap: 32px;
+}
+.ev-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--ev-font-mono);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  font-size: 15px;
+}
+.ev-logo-mark { display: inline-flex; opacity: 0.95; width: 50px; height: 50px; }
+.ev-logo-text { letter-spacing: 0.04em; }
+
+.ev-nav-links {
+  display: flex;
+  gap: 28px;
+  margin: 0 auto 0 16px;
+  padding: 0;
+  list-style: none;
+}
+.ev-nav-links a {
+  font-size: 13.5px;
+  color: var(--ev-fg-2);
+  letter-spacing: 0.01em;
+  transition: color .15s ease;
+}
+.ev-nav-links a:hover { color: var(--ev-fg); }
+
+.ev-nav-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+
+.ev-lang {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--ev-font-mono);
+  font-size: 12px;
+  color: var(--ev-fg-3);
+}
+.ev-lang-btn {
+  background: none;
+  border: 0;
+  color: inherit;
+  padding: 4px 2px;
+  letter-spacing: 0.04em;
+}
+.ev-lang-btn.is-active { color: var(--ev-fg); }
+.ev-lang-sep { color: var(--ev-fg-4); }
+
+.ev-burger {
+  display: none;
+  background: none;
+  border: 1px solid var(--ev-line);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--ev-radius);
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+.ev-burger span { display: block; width: 14px; height: 1px; background: var(--ev-fg); }
+.ev-nav-mobile { display: none; }
+
+/* === Buttons === */
+.ev-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 32px;
+  font-size: 15.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  border-radius: 999px;
+  border: none;
+  transition: all .35s cubic-bezier(0.4, 0, 0.2, 1);
+  white-space: nowrap;
+  position: relative;
+  overflow: hidden;
+}
+.ev-btn-sm { padding: 10px 18px; font-size: 13px; border-radius: 16px; }
+.ev-btn-lg { padding: 20px 36px; font-size: 17px; border-radius: 24px; }
+
+.ev-btn-primary {
+  background: linear-gradient(135deg, #ec6624 0%, #ff7a4a 50%, #ec6624 100%);
+  background-size: 200% 200%;
+  color: #fff;
+  box-shadow:
+    0 4px 20px rgba(236, 102, 36, 0.35),
+    0 2px 8px rgba(236, 102, 36, 0.2) inset;
+}
+.ev-btn-primary:hover {
+  background-position: 100% 0;
+  transform: translateY(-3px);
+  box-shadow:
+    0 8px 32px rgba(236, 102, 36, 0.5),
+    0 4px 12px rgba(236, 102, 36, 0.3) inset;
+}
+.ev-btn-primary:active {
+  transform: translateY(-1px);
+}
+.ev-btn-primary:disabled { opacity: 0.6; cursor: progress; }
+
+.ev-btn-ghost {
+  background: rgba(236, 102, 36, 0.08);
+  color: #ec6624;
+  border: 1.5px solid rgba(236, 102, 36, 0.35);
+  backdrop-filter: blur(8px);
+}
+.ev-btn-ghost:hover {
+  background: rgba(236, 102, 36, 0.15);
+  border-color: rgba(236, 102, 36, 0.55);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(236, 102, 36, 0.2);
+}
+
+.ev-btn-arrow {
+  display: inline-block;
+  transition: transform .25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.ev-btn:hover .ev-btn-arrow { transform: translateX(5px); }
+
+/* === Hero === */
+.ev-hero {
+  padding-top: clamp(100px, 12vw, 160px);
+  padding-bottom: clamp(100px, 12vw, 160px);
+  border-top: 0;
+  position: relative;
+  overflow: hidden;
+}
+.ev-hero-grid-layout {
+  display: grid;
+  grid-template-columns: 1.1fr 1.2fr;
+  gap: clamp(60px, 10vw, 120px);
+  align-items: center;
+}
+.ev-hero-content {
+  min-width: 0;
+  max-width: 720px;
+}
+
+.ev-hero-visual {
+  position: relative;
+  width: 100%;
+  margin-top: -25px;
+}
+
+/* Terminal window styling */
+.ev-terminal {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: #0d0d0d;
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow:
+    0 20px 60px rgba(0,0,0,0.6),
+    0 0 40px rgba(236, 102, 36, 0.1);
+}
+
+.ev-terminal-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 20px;
+  background: #1a1a1a;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.ev-terminal-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #4a4a4a;
+}
+.ev-terminal-dot.red { background: #ff5f56; }
+.ev-terminal-dot.yellow { background: #ffbd2e; }
+.ev-terminal-dot.green { background: #27ca40; }
+
+.ev-terminal-title {
+  margin-left: 8px;
+  font-family: var(--ev-font-mono);
+  font-size: 14px;
+  color: rgba(255,255,255,0.5);
+  letter-spacing: 0.05em;
+}
+
+.ev-terminal-body {
+  padding: 28px 32px;
+  font-family: var(--ev-font-mono);
+  font-size: 20px;
+  line-height: 1.7;
+  color: #e0e0e0;
+  min-height: 320px;
+  overflow: hidden;
+}
+
+.ev-terminal-line {
+  display: flex;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.ev-terminal-prompt {
+  color: #4ade80;
+  margin-right: 10px;
+  white-space: nowrap;
+  font-size: 20px;
+}
+
+.ev-terminal-command {
+  color: #e0e0e0;
+  flex: 1;
+  word-break: break-word;
+  font-size: 20px;
+}
+
+.ev-terminal-output {
+  color: rgba(255,255,255,0.8);
+  margin-left: 34px;
+  margin-bottom: 16px;
+  font-size: 16px;
+}
+
+.ev-terminal-cursor {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  background: #ffffff;
+  margin-left: 4px;
+  animation: terminal-blink 1s step-end infinite;
+  vertical-align: middle;
+}
+
+@keyframes terminal-blink {
+  0%, 50% { opacity: 1; }
+  51%, 100% { opacity: 0; }
+}
+
+/* Scanline effect */
+.ev-terminal::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0,0,0,0.15) 0px,
+    rgba(0,0,0,0.15) 1px,
+    transparent 1px,
+    transparent 2px
+  );
+  pointer-events: none;
+  z-index: 10;
+}
+.ev-hero-visual-frame {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border: 1px solid var(--ev-line);
+  background: var(--ev-bg-2);
+  overflow: hidden;
+}
+.ev-hero-visual-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  filter: contrast(1.05);
+}
+.ev-hero-visual-corners span {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid var(--ev-fg);
+  opacity: 0.85;
+}
+.ev-hero-visual-corners span:nth-child(1) { top: 10px; left: 10px; border-right: 0; border-bottom: 0; }
+.ev-hero-visual-corners span:nth-child(2) { top: 10px; right: 10px; border-left: 0; border-bottom: 0; }
+.ev-hero-visual-corners span:nth-child(3) { bottom: 10px; left: 10px; border-right: 0; border-top: 0; }
+.ev-hero-visual-corners span:nth-child(4) { bottom: 10px; right: 10px; border-left: 0; border-top: 0; }
+
+.ev-hero-visual-meta {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 18px;
+  font-family: var(--ev-font-mono);
+  font-size: 10.5px;
+  color: var(--ev-fg-2);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  background: linear-gradient(transparent, rgba(0,0,0,0.65) 60%);
+}
+.ev-hero-grid {
+  position: absolute;
+  inset: 0;
+  color: rgba(255,255,255,0.05);
+  pointer-events: none;
+  -webkit-mask-image: radial-gradient(ellipse at 80% 20%, #000 0%, transparent 65%);
+  mask-image: radial-gradient(ellipse at 80% 20%, #000 0%, transparent 65%);
+}
+
+.ev-hero-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--ev-font-mono);
+  font-size: 12.5px;
+  color: var(--ev-fg-2);
+  letter-spacing: 0.04em;
+  margin-bottom: 32px;
+  padding: 6px 12px 6px 8px;
+  border: 1px solid var(--ev-line);
+  border-radius: 100px;
+  background: var(--ev-bg-2);
+}
+.ev-hero-content { max-width: 700px; }
+.ev-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #4ade80;
+  box-shadow: 0 0 0 4px rgba(74, 222, 128, 0.15);
+}
+
+.ev-hero-title {
+  font-family: var(--ev-font-display);
+  font-size: clamp(28px, 4vw, 48px);
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  margin: 0 0 28px;
+  text-wrap: balance;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.ev-hero-title-line {
+  display: block;
+  white-space: nowrap;
+}
+.ev-hero-sub {
+  font-size: clamp(15px, 1.3vw, 18px);
+  line-height: 1.6;
+  color: var(--ev-fg-2);
+  max-width: 56ch;
+  margin: 0 0 40px;
+}
+.ev-hero-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.ev-hero-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 24px;
+  padding-top: 32px;
+  border-top: 1px solid var(--ev-line);
+  font-family: var(--ev-font-mono);
+  font-size: 12px;
+  color: var(--ev-fg-3);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+.ev-hero-meta-item { position: relative; padding-left: 14px; }
+.ev-hero-meta-item::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 4px;
+  background: var(--ev-fg-3);
+}
+
+/* === Section Header === */
+.ev-sec-head { margin-bottom: 64px; max-width: 56ch; }
+.ev-sec-head.is-compact { margin-bottom: 32px; }
+.ev-kicker {
+  font-family: var(--ev-font-mono);
+  font-size: 12px;
+  color: var(--ev-fg-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+.ev-sec-title {
+  font-family: var(--ev-font-display);
+  font-size: clamp(28px, 3.6vw, 44px);
+  line-height: 1.12;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  margin: 0 0 20px;
+  text-wrap: balance;
+}
+.ev-sec-sub {
+  font-size: 16px;
+  color: var(--ev-fg-2);
+  margin: 0;
+  max-width: 56ch;
+}
+
+/* Contact section specific styling */
+.ev-sec-head.is-contact .ev-sec-title {
+  color: var(--ev-accent);
+}
+
+/* === Services === */
+.ev-services-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 24px;
+  background: transparent;
+}
+.ev-service-card {
+  background: var(--ev-bg-2);
+  padding: 44px 36px 40px;
+  display: flex;
+  flex-direction: column;
+  min-height: 360px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--ev-line);
+  border-radius: 16px;
+  transition: transform .4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow .4s cubic-bezier(0.4, 0, 0.2, 1), border-color .3s ease;
+}
+.ev-service-card:hover {
+  transform: translateY(-10px);
+  box-shadow:
+    0 25px 70px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(236, 102, 36, 0.12) inset;
+  border-color: rgba(236, 102, 36, 0.35);
+}
+/* 5 cards: inverted triangle layout (3 on top, 2 on bottom) */
+.ev-service-card:nth-child(1) { grid-column: 1 / 3; }
+.ev-service-card:nth-child(2) { grid-column: 3 / 5; }
+.ev-service-card:nth-child(3) { grid-column: 5 / 7; }
+.ev-service-card:nth-child(4) { grid-column: 1 / 4; }
+.ev-service-card:nth-child(5) { grid-column: 4 / 7; }
+
+/* Shimmer effect on hover */
+.ev-service-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.05),
+    transparent
+  );
+  transition: left 0.6s ease;
+  pointer-events: none;
+}
+.ev-service-card:hover::before {
+  left: 100%;
+}
+
+/* Glow effect on hover */
+.ev-service-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid transparent;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+  pointer-events: none;
+  border-radius: 4px;
+}
+.ev-service-card:hover::after {
+  border-color: rgba(236, 102, 36, 0.4);
+  box-shadow:
+    0 0 30px rgba(236, 102, 36, 0.15),
+    0 0 60px rgba(236, 102, 36, 0.08) inset;
+}
+
+/* Inner glow gradient */
+.ev-service-card-inner {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+    rgba(236, 102, 36, 0.08),
+    transparent 60%
+  );
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+.ev-service-card:hover .ev-service-card-inner {
+  opacity: 1;
+}
+
+.ev-service-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 32px;
+}
+.ev-service-id {
+  font-family: var(--ev-font-mono);
+  font-size: 11px;
+  color: var(--ev-fg-3);
+  letter-spacing: 0.08em;
+}
+.ev-service-arrow {
+  font-size: 16px;
+  color: var(--ev-fg-3);
+  transition: transform .2s ease, color .2s ease;
+}
+.ev-service-card:hover .ev-service-arrow { color: var(--ev-accent); transform: translate(2px, -2px); }
+
+.ev-service-name {
+  font-family: var(--ev-font-display);
+  font-size: 24px;
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  font-weight: 600;
+  margin: 0 0 16px;
+  text-wrap: balance;
+  color: var(--ev-fg);
+}
+.ev-service-desc {
+  font-size: 15.5px;
+  line-height: 1.7;
+  color: var(--ev-fg-2);
+  margin: 0 0 28px;
+}
+.ev-service-meta {
+  margin-top: auto;
+  padding-top: 24px;
+  border-top: 1px solid var(--ev-line);
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+.ev-service-meta-row {
+  display: grid;
+  grid-template-columns: 70px 1fr;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.ev-service-meta-label {
+  font-family: var(--ev-font-mono);
+  font-size: 10.5px;
+  color: var(--ev-fg-4);
+  letter-spacing: 0.1em;
+  padding-top: 2px;
+}
+.ev-service-meta-val { color: var(--ev-fg-2); }
+.ev-service-deliver {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  color: var(--ev-fg-2);
+}
+.ev-service-deliver li {
+  padding-left: 14px;
+  position: relative;
+  margin-bottom: 4px;
+}
+.ev-service-deliver li::before {
+  content: "—";
+  position: absolute;
+  left: 0;
+  color: var(--ev-fg-4);
+}
+
+/* === Cases === */
+.ev-cases-list { border-top: 1px solid var(--ev-line); }
+.ev-case-row {
+  display: grid;
+  grid-template-columns: 80px 280px 1fr;
+  gap: 32px;
+  padding: 24px 0;
+  border-bottom: 1px solid var(--ev-line);
+  align-items: baseline;
+  transition: background .15s ease, padding .2s ease;
+  cursor: default;
+}
+.ev-case-row:hover {
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.02) 50%, transparent);
+  padding-left: 8px;
+}
+.ev-case-id {
+  font-family: var(--ev-font-mono);
+  font-size: 11.5px;
+  color: var(--ev-fg-3);
+  letter-spacing: 0.08em;
+}
+.ev-case-t {
+  font-size: 17px;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+.ev-case-d {
+  font-size: 14.5px;
+  color: var(--ev-fg-2);
+}
+
+/* === Process === */
+.ev-process-track {
+  position: relative;
+  padding: 20px 0;
+}
+
+/* Vertical gradient line in the center */
+.ev-process-track::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(
+    180deg,
+    rgba(236, 102, 36, 0.6) 0%,
+    rgba(236, 102, 36, 0.3) 30%,
+    rgba(236, 102, 36, 0.1) 70%,
+    transparent 100%
+  );
+}
+
+/* Glowing dots along the line */
+.ev-process-track::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px;
+  height: 6px;
+  background: var(--ev-accent);
+  border-radius: 50%;
+  box-shadow:
+    0 0 10px rgba(236, 102, 36, 0.6),
+    0 0 20px rgba(236, 102, 36, 0.3);
+  animation: process-flow 4s ease-in-out infinite;
+}
+
+@keyframes process-flow {
+  0%, 100% { top: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+
+.ev-process-step {
+  display: flex;
+  gap: 40px;
+  align-items: flex-start;
+  margin-bottom: 48px;
+  position: relative;
+}
+
+.ev-process-step:last-child {
+  margin-bottom: 0;
+}
+
+/* Alternating layout */
+.ev-process-step:nth-child(odd) {
+  flex-direction: row-reverse;
+  text-align: right;
+}
+
+.ev-process-step-content {
+  flex: 1;
+  max-width: 45%;
+  position: relative;
+  z-index: 1;
+}
+
+.ev-process-step-head {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 12px;
+}
+
+.ev-process-step:nth-child(odd) .ev-process-step-head {
+  flex-direction: row-reverse;
+}
+
+.ev-process-num {
+  font-family: var(--ev-font-mono);
+  font-size: 14px;
+  color: var(--ev-accent);
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+.ev-process-tick {
+  width: 12px;
+  height: 12px;
+  background: var(--ev-bg);
+  border: 2px solid var(--ev-accent);
+  border-radius: 50%;
+  position: relative;
+  z-index: 2;
+  box-shadow:
+    0 0 15px rgba(236, 102, 36, 0.4),
+    0 0 30px rgba(236, 102, 36, 0.2);
+  transition: all 0.3s ease;
+}
+
+.ev-process-step:hover .ev-process-tick {
+  transform: scale(1.3);
+  box-shadow:
+    0 0 25px rgba(236, 102, 36, 0.6),
+    0 0 50px rgba(236, 102, 36, 0.4);
+}
+
+/* Connecting line from tick to center */
+.ev-process-step::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  width: 50%;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    rgba(236, 102, 36, 0.4),
+    transparent
+  );
+}
+
+.ev-process-step:nth-child(odd)::before {
+  right: calc(50% + 6px);
+}
+
+.ev-process-step:nth-child(even)::before {
+  left: calc(50% + 6px);
+}
+
+.ev-process-t {
+  font-family: var(--ev-font-display);
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  margin: 0 0 10px;
+  color: var(--ev-fg);
+}
+
+.ev-process-d {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--ev-fg-2);
+  margin: 0;
+}
+
+/* === Why === */
+.ev-why-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 1px;
+  background: var(--ev-line);
+  position: relative;
+}
+
+.ev-why-item {
+  position: relative;
+  padding: 52px 40px 48px;
+  background: var(--ev-bg-2);
+  border: 1px solid var(--ev-line);
+  border-radius: 16px;
+  overflow: hidden;
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease;
+}
+.ev-why-item:hover {
+  transform: translateY(-8px);
+  box-shadow:
+    0 20px 60px rgba(0, 0, 0, 0.4),
+    0 0 80px rgba(236, 102, 36, 0.12) inset;
+  border-color: rgba(236, 102, 36, 0.3);
+  z-index: 1;
+}
+
+/* Shimmer effect */
+.ev-why-item::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(236, 102, 36, 0.1),
+    transparent
+  );
+  transition: left 0.6s ease;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.ev-why-item:hover::before {
+  left: 100%;
+}
+
+/* Hover glow effect */
+.ev-why-item:hover {
+  transform: translateY(-6px);
+  box-shadow:
+    0 15px 50px rgba(236, 102, 36, 0.2),
+    0 0 80px rgba(236, 102, 36, 0.15) inset;
+  z-index: 1;
+}
+
+/* Large number badge */
+.ev-why-num {
+  font-family: var(--ev-font-mono);
+  font-size: 56px;
+  font-weight: 700;
+  color: rgba(236, 102, 36, 0.12);
+  letter-spacing: -0.02em;
+  position: absolute;
+  top: 24px;
+  right: 28px;
+  line-height: 1;
+  z-index: 0;
+}
+
+.ev-why-item:hover .ev-why-num {
+  color: rgba(236, 102, 36, 0.2);
+}
+
+.ev-why-t {
+  font-family: var(--ev-font-display);
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  margin: 0 0 20px;
+  color: var(--ev-fg);
+  position: relative;
+  z-index: 1;
+}
+
+.ev-why-d {
+  font-size: 15.5px;
+  line-height: 1.75;
+  color: var(--ev-fg-2);
+  margin: 0;
+  position: relative;
+  z-index: 1;
+}
+
+/* === About === */
+.ev-about-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 80px;
+  align-items: start;
+}
+.ev-about-p {
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--ev-fg-2);
+  margin: 0 0 18px;
+  max-width: 56ch;
+}
+.ev-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  margin: 0;
+  border: 1px solid var(--ev-line);
+  background: var(--ev-line);
+}
+.ev-stat {
+  background: var(--ev-bg);
+  padding: 24px 22px 28px;
+  display: flex;
+  flex-direction: column;
+}
+.ev-stat-l {
+  font-family: var(--ev-font-mono);
+  font-size: 11px;
+  color: var(--ev-fg-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-bottom: 14px;
+}
+.ev-stat-v {
+  font-family: var(--ev-font-display);
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  font-weight: 500;
+  margin: 0;
+  color: var(--ev-fg);
+}
+
+/* === Contact === */
+.ev-contact-grid {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 80px;
+  align-items: start;
+}
+.ev-contact-meta {
+  list-style: none;
+  margin: 32px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.ev-contact-meta li {
+  display: grid;
+  grid-template-columns: 100px 1fr;
+  gap: 16px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--ev-line);
+}
+.ev-meta-l {
+  font-family: var(--ev-font-mono);
+  font-size: 11px;
+  color: var(--ev-fg-3);
+  letter-spacing: 0.08em;
+}
+.ev-meta-v {
+  font-size: 14px;
+  color: var(--ev-fg);
+}
+
+.ev-form { display: flex; flex-direction: column; gap: 22px; }
+.ev-form-row { display: flex; flex-direction: column; gap: 22px; }
+.ev-form-row.two { display: grid; grid-template-columns: 1fr 1fr; gap: 22px; }
+
+.ev-field { display: flex; flex-direction: column; gap: 8px; }
+.ev-field-l {
+  font-family: var(--ev-font-mono);
+  font-size: 11px;
+  color: var(--ev-fg-3);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.ev-req { color: #f97171; margin-left: 2px; }
+.ev-err {
+  margin-left: auto;
+  color: #f97171;
+  font-family: var(--ev-font-sans);
+  text-transform: none;
+  letter-spacing: 0;
+  font-size: 11.5px;
+}
+
+.ev-field input,
+.ev-field textarea,
+.ev-field select {
+  width: 100%;
+  background: var(--ev-bg-2);
+  border: 1px solid var(--ev-line);
+  color: var(--ev-fg);
+  padding: 12px 14px;
+  font-size: 14px;
+  border-radius: var(--ev-radius);
+  outline: none;
+  transition: border-color .15s ease, background .15s ease;
+  resize: vertical;
+}
+.ev-field input:focus,
+.ev-field textarea:focus,
+.ev-field select:focus {
+  border-color: var(--ev-fg);
+  background: var(--ev-bg-3);
+}
+.ev-field.has-err input,
+.ev-field.has-err textarea {
+  border-color: #f97171;
+}
+.ev-field select {
+  appearance: none;
+  background-image: linear-gradient(45deg, transparent 50%, var(--ev-fg-2) 50%), linear-gradient(135deg, var(--ev-fg-2) 50%, transparent 50%);
+  background-position: calc(100% - 18px) 50%, calc(100% - 13px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  padding-right: 36px;
+}
+
+.ev-form-more summary {
+  font-family: var(--ev-font-mono);
+  font-size: 12px;
+  color: var(--ev-fg-3);
+  letter-spacing: 0.04em;
+  cursor: pointer;
+  padding: 12px 0;
+  border-top: 1px dashed var(--ev-line);
+  list-style: none;
+}
+.ev-form-more summary::-webkit-details-marker { display: none; }
+.ev-form-more summary:hover { color: var(--ev-fg); }
+.ev-form-more[open] summary { color: var(--ev-fg); }
+.ev-form-more > *:not(summary) { margin-top: 18px; }
+
+.ev-radio-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.ev-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--ev-line);
+  font-size: 13px;
+  color: var(--ev-fg-2);
+  cursor: pointer;
+  border-radius: var(--ev-radius);
+  transition: all .15s ease;
+}
+.ev-radio input { display: none; }
+.ev-radio.is-on { border-color: var(--ev-fg); color: var(--ev-fg); background: var(--ev-bg-2); }
+
+.ev-form-submit { padding-top: 8px; }
+
+.ev-contact-success {
+  text-align: center;
+  padding: 80px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.ev-success-mark {
+  width: 64px;
+  height: 64px;
+  border: 1px solid var(--ev-fg);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ev-fg);
+  margin: 24px 0 24px;
+}
+
+/* === Footer === */
+.ev-footer {
+  border-top: 1px solid var(--ev-line);
+  padding: 48px 0 32px;
+}
+.ev-footer-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+  padding-bottom: 32px;
+  border-bottom: 1px solid var(--ev-line);
+  margin-bottom: 24px;
+}
+.ev-footer-tag {
+  margin: 12px 0 0;
+  color: var(--ev-fg-3);
+  font-size: 13px;
+}
+.ev-footer-contact {
+  font-family: var(--ev-font-mono);
+  font-size: 13px;
+  color: var(--ev-fg-2);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: right;
+}
+.ev-footer-contact-row {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}
+.ev-footer-bottom {
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--ev-font-mono);
+  font-size: 11.5px;
+  color: var(--ev-fg-3);
+  letter-spacing: 0.04em;
+}
+
+/* === Responsive === */
+@media (max-width: 1024px) {
+  .ev-hero-grid-layout { grid-template-columns: 1fr; gap: 56px; }
+  .ev-hero-visual-wrap { max-width: 100%; }
+  .ev-hero-visual { position: relative; }
+  .ev-terminal { height: 360px; }
+
+  .ev-services-grid { grid-template-columns: repeat(2, 1fr); }
+  .ev-service-card:nth-child(1) { grid-column: span 2 !important; }
+  .ev-service-card:nth-child(2) { grid-column: span 2 !important; }
+  .ev-service-card:nth-child(3) { grid-column: span 2 !important; }
+  .ev-service-card:nth-child(4) { grid-column: span 2 !important; }
+  .ev-service-card:nth-child(5) { grid-column: span 2 !important; }
+
+  .ev-process-track::before {
+    width: 4px;
+    background: linear-gradient(
+      180deg,
+      rgba(236, 102, 36, 0.8) 0%,
+      rgba(236, 102, 36, 0.4) 50%,
+      transparent 100%
+    );
+  }
+  .ev-process-step {
+    gap: 24px;
+    margin-bottom: 36px;
+  }
+
+  .ev-why-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .ev-why-item {
+    padding: 36px 28px 32px;
+  }
+  .ev-why-num {
+    font-size: 42px;
+    top: 18px;
+    right: 20px;
+  }
+  .ev-why-t {
+    font-size: 18px;
+  }
+  .ev-why-d {
+    font-size: 14px;
+  }
+  .ev-process-step-content {
+    max-width: 70%;
+  }
+  .ev-process-t {
+    font-size: 16px;
+  }
+  .ev-process-d {
+    font-size: 13px;
+  }
+
+  .ev-why-grid { grid-template-columns: repeat(2, 1fr); }
+
+  .ev-about-grid, .ev-contact-grid { grid-template-columns: 1fr; gap: 48px; }
+
+  .ev-case-row { grid-template-columns: 60px 220px 1fr; gap: 20px; }
+}
+
+@media (max-width: 720px) {
+  .ev-nav-links { display: none; }
+  .ev-burger { display: inline-flex; }
+  .ev-nav-mobile {
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid var(--ev-line);
+    padding: 12px var(--ev-pad);
+    gap: 4px;
+  }
+  .ev-nav-mobile a { padding: 12px 0; color: var(--ev-fg-2); border-bottom: 1px solid var(--ev-line); }
+  .ev-nav-mobile a:last-child { border-bottom: 0; }
+  .ev-nav-right { gap: 12px; }
+  .ev-lang { display: none; }
+  .ev-terminal { height: 300px; }
+  .ev-terminal-body { font-size: 15px; padding: 16px; }
+
+  .ev-why-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .ev-footer-top {
+    flex-direction: column;
+    gap: 32px;
+  }
+  .ev-footer-contact {
+    text-align: left;
+  }
+  .ev-footer-contact-row {
+    justify-content: flex-start;
+  }
+  .ev-why-item {
+    padding: 32px 28px 36px;
+  }
+  .ev-why-num {
+    font-size: 48px;
+    top: 20px;
+    right: 24px;
+  }
+  .ev-why-t {
+    font-size: 19px;
+    margin-bottom: 14px;
+  }
+  .ev-why-d {
+    font-size: 14.5px;
+  }
+
+  /* Mobile: single column vertical flow */
+  .ev-process-track::before {
+    left: 20px;
+  }
+  .ev-process-step {
+    flex-direction: column;
+    gap: 12px;
+    margin-left: 40px;
+    margin-bottom: 32px;
+  }
+  .ev-process-step:nth-child(odd) {
+    flex-direction: column;
+    text-align: left;
+  }
+  .ev-process-step-content {
+    max-width: 100%;
+  }
+  .ev-process-step-head {
+    gap: 10px;
+    margin-bottom: 8px;
+  }
+  .ev-process-num {
+    font-size: 12px;
+  }
+  .ev-process-tick {
+    width: 10px;
+    height: 10px;
+  }
+  .ev-process-t {
+    font-size: 15px;
+    margin-bottom: 6px;
+  }
+  .ev-process-d {
+    font-size: 13px;
+  }
+  .ev-process-step::before {
+    display: none;
+  }
+
+  .ev-services-grid { grid-template-columns: 1fr; }
+  .ev-service-card:nth-child(1) { grid-column: span 1 !important; }
+  .ev-service-card:nth-child(2) { grid-column: span 1 !important; }
+  .ev-service-card:nth-child(3) { grid-column: span 1 !important; }
+  .ev-service-card:nth-child(4) { grid-column: span 1 !important; }
+  .ev-service-card:nth-child(5) { grid-column: span 1 !important; }
+  .ev-service-card { min-height: 0; }
+
+  .ev-case-row {
+    grid-template-columns: 1fr;
+    gap: 6px;
+    padding: 18px 0;
+  }
+  .ev-case-id { font-size: 10.5px; }
+
+  .ev-process-track { grid-template-columns: repeat(2, 1fr); }
+
+  .ev-why-grid { grid-template-columns: 1fr; }
+
+  .ev-form-row.two { grid-template-columns: 1fr; }
+  .ev-stats { grid-template-columns: 1fr; }
+
+  .ev-hero-eyebrow { font-size: 11px; }
+}
+
+/* === Tweaks: typography presets === */
+body[data-typo="inter"] {
+  --ev-font-sans: "Inter", "Noto Sans TC", system-ui, sans-serif;
+  --ev-font-display: "Inter", "Noto Sans TC", system-ui, sans-serif;
+}
+body[data-typo="grotesk"] {
+  --ev-font-sans: "Space Grotesk", "Noto Sans TC", system-ui, sans-serif;
+  --ev-font-display: "Space Grotesk", "Noto Sans TC", system-ui, sans-serif;
+}
+body[data-typo="serif"] {
+  --ev-font-sans: "Inter", "Noto Sans TC", system-ui, sans-serif;
+  --ev-font-display: "Instrument Serif", "Noto Serif TC", Georgia, serif;
+}
+body[data-typo="serif"] .ev-hero-title,
+body[data-typo="serif"] .ev-sec-title {
+  font-weight: 400;
+  letter-spacing: -0.015em;
+}
+body[data-typo="mono"] {
+  --ev-font-sans: "JetBrains Mono", "Noto Sans TC", monospace;
+  --ev-font-display: "JetBrains Mono", monospace;
+}
+body[data-typo="mono"] .ev-hero-title,
+body[data-typo="mono"] .ev-sec-title {
+  letter-spacing: -0.04em;
+  font-weight: 500;
+}
+</style>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+</head>
+<body data-typo="inter">
+<div id="root"></div>
+
+<script type="text/babel">
+// i18n.jsx — EntroVi i18n strings
+const I18N = {
+  en: {
+    nav: {
+      services: "Services",
+      process: "Process",
+      why: "Our edge",
+      contact: "Contact",
+      cta: "Let's talk",
+    },
+    hero: {
+      eyebrow: "From AI concept to deployed system",
+      title: "Build. Train. Deploy. AI Solutions, End to End.",
+      sub: "EntroVi fills the blank of your overwhelmed gap of AI in your Business. We fix the true issue: you don't know what you don't know.",
+      cta1: "Contact us",
+      cta2: "View services",
+      meta: ["Model training", "Computer vision", "Edge AI", "RAG systems", "Deployment & integration"],
+    },
+    services: {
+      kicker: "01 — Practice areas",
+      title: "What we build",
+      sub: "",
+      items: [
+        {
+          id: "S01",
+          name: "AI Model Training & Development",
+          desc: "Custom model design, training and evaluation against your data, your hardware and your accuracy targets.",
+          fit: "When off-the-shelf models miss the long tail of your domain, or you need ownership of the weights.",
+          deliver: ["Trained model artifacts", "Eval reports & error analysis", "Training pipeline & docs"],
+        },
+        {
+          id: "S02",
+          name: "Object Recognition & Computer Vision",
+          desc: "Defect detection, classification, OCR and inspection systems engineered for production line conditions.",
+          fit: "Quality control, surface inspection, part counting, factory line automation.",
+          deliver: ["Vision pipeline", "Camera & lighting spec", "Operator dashboard"],
+        },
+        {
+          id: "S03",
+          name: "Edge AI System Development",
+          desc: "Low-latency inference on Jetson, industrial PCs and embedded boards — engineered for uptime, not demos.",
+          fit: "Air-gapped sites, real-time decisions, restricted bandwidth, sub-100ms latency targets.",
+          deliver: ["Edge runtime", "OTA update channel", "Field-deploy playbook"],
+        },
+        {
+          id: "S04",
+          name: "RAG Knowledge Base & AI Assistants",
+          desc: "Retrieval-augmented assistants over your documents, SOPs and tickets — with traceable citations.",
+          fit: "Internal Q&A, document search, frontline support, compliance review.",
+          deliver: ["Indexed corpus", "RAG service & UI", "Eval harness for accuracy"],
+        },
+        {
+          id: "S05",
+          name: "Deployment, Optimisation & Integration",
+          desc: "Quantisation, distillation and system integration so models survive contact with real infrastructure.",
+          fit: "Existing models that need to ship to production, get faster, or fit a smaller device.",
+          deliver: ["Optimised model", "Deployment infra", "Monitoring & rollback"],
+        },
+      ],
+    },
+    cases: {
+      kicker: "02 — Use Cases",
+      title: "Where it runs",
+      sub: "Where theory becomes practice.",
+      items: [
+        { id: "U01", t: "Industrial defect detection", d: "Surface, weld and assembly inspection at line speed." },
+        { id: "U02", t: "Production line vision", d: "Counting, sorting and label verification on conveyors." },
+        { id: "U03", t: "Equipment status monitoring", d: "Visual telemetry for machinery health and anomaly alerts." },
+        { id: "U04", t: "On-site edge inference", d: "Real-time decisions at the device, no cloud round-trip." },
+        { id: "U05", t: "Internal document knowledge", d: "Searchable, cited Q&A across SOPs, manuals and tickets." },
+        { id: "U06", t: "Internal AI assistants", d: "Role-aware copilots grounded in company data." },
+        { id: "U07", t: "Model deployment & tuning", d: "Take an existing model from notebook to production SLA." },
+      ],
+    },
+    process: {
+      kicker: "03 — Process",
+      title: "Our process",
+      sub: "Linear. Predictable. Delivered.",
+      steps: [
+        { n: "01", t: "Requirements", d: "Scope the problem, the metric of success and the constraints that matter." },
+        { n: "02", t: "Data & site survey", d: "Audit available data, capture environment, hardware and access reality." },
+        { n: "03", t: "Technical proposal", d: "Architecture, model strategy, deployment plan, timeline and price." },
+        { n: "04", t: "Build & integrate", d: "Develop, train, integrate with existing systems and instruments." },
+        { n: "05", t: "Validate & deploy", d: "On-site validation against the agreed metric, then production rollout." },
+        { n: "06", t: "Maintain & optimise", d: "Monitoring, retraining cycles and ongoing performance work." },
+      ],
+    },
+    why: {
+      kicker: "04 — Our edge",
+      title: "From model to production",
+      points: [
+        { t: "Beyond the model", d: "We don't stop at a notebook. We ship the runtime, the integration and the maintenance plan." },
+        { t: "Vision + edge fluency", d: "Deep practice in image recognition, machine vision and constrained-device deployment." },
+        { t: "Customised to your reality", d: "Architectures shaped by your data, your equipment, your operating procedures." },
+        { t: "Production metrics matter", d: "Accuracy, latency, uptime and cost-to-serve are scoped before code is written." },
+        { t: "PoC to production", d: "Engineered handoff from proof-of-concept to a system your operations team can run." },
+      ],
+    },
+    about: {
+      kicker: "05 — Who we are",
+      title: "EntroVi Ltd.",
+      p1: "EntroVi is an AI engineering studio. We bring AI systems into real environments — factories, field equipment, and edge infrastructure.",
+      p2: "Our work spans model training, computer vision, edge AI, RAG systems, and deployment.",
+      stats: [
+        { v: "5", l: "Practice areas" },
+        { v: "End-to-end", l: "Engagement model" },
+        { v: "Edge / Cloud", l: "Deployment targets" },
+        { v: "EN / 中文", l: "Working languages" },
+      ],
+    },
+    contact: {
+      kicker: "05 — Contact",
+      title: "Let's talk.",
+      sub: "Let's discuss your needs.",
+      fields: {
+        name: "Name",
+        company: "Company",
+        email: "Email",
+        phone: "Phone",
+        interest: "Service of interest",
+        message: "Project description",
+        budget: "Budget range (optional)",
+        timeline: "Target timeline (optional)",
+        haveData: "Existing data or imagery",
+        notes: "Anything else",
+        submit: "Send enquiry",
+        sending: "Sending…",
+        sent: "Received. We'll be in touch within 2 business days.",
+        required: "Required",
+        invalidEmail: "Enter a valid email",
+      },
+      interestOptions: [
+        "Model training & development",
+        "Image recognition / machine vision",
+        "Edge AI system",
+        "RAG knowledge base",
+        "Deployment & integration",
+        "Not sure yet",
+      ],
+      haveOptions: ["Yes", "Some", "No", "Need to discuss"],
+    },
+    footer: {
+      tagline: "Taipei, Taiwan",
+      copy: "© 2026 EntroVi Ltd. All rights reserved.",
+      contactLine: "yen@entrovi.com",
+    },
+  },
+  zh: {
+    nav: {
+      services: "服務",
+      cases: "應用場景",
+      process: "流程",
+      why: "我們的優勢",
+      about: "關於",
+      contact: "聯絡",
+      cta: "聯絡我們",
+    },
+    hero: {
+      eyebrow: "從 AI 概念到上線部署",
+      title: "Build. Train. Deploy. AI Solutions, End to End.",
+      sub: "EntroVi 填補你 AI 落地的空白。我們解決真正問題：你不知道你不知道什麼。",
+      cta1: "聯絡我們",
+      cta2: "查看服務",
+      meta: ["模型訓練", "機器視覺", "邊緣 AI", "RAG 系統", "部署整合"],
+    },
+    services: {
+      kicker: "01 — 核心服務",
+      title: "我們做什麼",
+      sub: "五大服務。從資料到部署，全程負責。",
+      items: [
+        {
+          id: "S01",
+          name: "AI 模型訓練與開發",
+          desc: "依您的資料、硬體與準確度目標，客製化設計、訓練與評估模型。",
+          fit: "現成模型搞不定你的產業特殊需求，或你需要模型權重時。",
+          deliver: ["訓練完成的模型", "評估報告與錯誤分析", "訓練管線與文件"],
+        },
+        {
+          id: "S02",
+          name: "影像辨識與機器視覺",
+          desc: "瑕疵檢測、分類、OCR 與檢驗系統，專為產線環境而設計。",
+          fit: "品質控管、表面檢測、零件計數、產線自動化。",
+          deliver: ["視覺辨識管線", "相機與打光規格", "操作端儀表板"],
+        },
+        {
+          id: "S03",
+          name: "邊緣 AI 系統開發",
+          desc: "Jetson、工業電腦與嵌入式板上的低延遲推論，為穩定上線而生。",
+          fit: "離線環境、即時決策、頻寬受限、100ms 內延遲要求。",
+          deliver: ["邊緣端執行環境", "OTA 更新通道", "現場部署手冊"],
+        },
+        {
+          id: "S04",
+          name: "RAG 知識庫與 AI 助理",
+          desc: "文件、SOP、工單之上的檢索增強助理，引用可追溯。",
+          fit: "內部問答、文件搜尋、第一線支援、合規審查。",
+          deliver: ["索引化語料庫", "RAG 服務與介面", "準確率評估工具"],
+        },
+        {
+          id: "S05",
+          name: "部署、優化與系統整合",
+          desc: "量化、蒸餾與系統整合，讓模型真正上線。",
+          fit: "既有模型需要上線、加速、或塞進更小裝置時。",
+          deliver: ["優化後的模型", "部署基礎設施", "監控與回滾機制"],
+        },
+      ],
+    },
+    cases: {
+      kicker: "02 — 應用場景",
+      title: "我們的系統落地之處",
+      sub: "目前實際運作的環境。",
+      items: [
+        { id: "U01", t: "工業瑕疵檢測", d: "產線速度下的表面、焊道與組裝檢驗。" },
+        { id: "U02", t: "產線影像辨識", d: "輸送帶上的計數、分類與標籤驗證。" },
+        { id: "U03", t: "設備狀態監控", d: "機具健康度與異常告警的視覺遙測。" },
+        { id: "U04", t: "現場邊緣推論", d: "於裝置端即時決策，無雲端往返。" },
+        { id: "U05", t: "企業文件知識庫", d: "可搜尋、可引用的 SOP/手冊/工單問答。" },
+        { id: "U06", t: "內部 AI 助理", d: "基於公司資料的角色感知協作工具。" },
+        { id: "U07", t: "模型部署與調校", d: "將既有模型從筆記本帶到生產級 SLA。" },
+      ],
+    },
+    process: {
+      kicker: "03 — 服務流程",
+      title: "專案如何推進",
+      sub: "線性合作。沒有戲法，沒有突發範圍變動。",
+      steps: [
+        { n: "01", t: "需求討論", d: "釐清問題、成功指標與真正重要的限制。" },
+        { n: "02", t: "資料與場景評估", d: "檢視可用資料、實地環境、硬體與存取現況。" },
+        { n: "03", t: "技術方案規劃", d: "架構、模型策略、部署計畫、時程與報價。" },
+        { n: "04", t: "開發與整合", d: "開發、訓練、整合既有系統與儀器。" },
+        { n: "05", t: "驗證與部署", d: "依約定指標現場驗證，然後上線。" },
+        { n: "06", t: "維護與優化", d: "監控、再訓練週期、持續性能優化。" },
+      ],
+    },
+    why: {
+      kicker: "04 — 我們的優勢",
+      title: "從模型到生產",
+      points: [
+        { t: "不只是模型", d: "我們不會停在筆記本。我們交付執行環境、整合方式與維運計畫。" },
+        { t: "視覺與邊緣熟練度", d: "深耕影像辨識、機器視覺與裝置受限環境部署。" },
+        { t: "為你的現實量身訂作", d: "架構由你的資料、設備與作業流程塑形。" },
+        { t: "生產指標才是關鍵", d: "動工前先界定準確率、延遲、可用性與每次推論成本。" },
+        { t: "PoC 到生產", d: "從概念驗證到營運團隊能自行運作的工程化交接。" },
+      ],
+    },
+    about: {
+      kicker: "05 — 關於",
+      title: "EntroVi Ltd.",
+      p1: "EntroVi 是一間 AI 工作室，專注於將模型驅動的系統帶進真實營運環境 — 工廠、現場設備、知識工作與工業邊緣。",
+      p2: "我們的系統橫跨模型訓練、影像辨識與機器視覺、邊緣 AI 部署、RAG 知識庫，以及讓這些系統穩定運作數年而非數週的整合工程。",
+      stats: [
+        { v: "5", l: "服務領域" },
+        { v: "端到端", l: "合作模式" },
+        { v: "邊緣 / 雲端", l: "部署目標" },
+        { v: "EN / 中文", l: "工作語言" },
+      ],
+    },
+    contact: {
+      kicker: "05 — 聯絡",
+      title: "讓我們談談。",
+      sub: "告訴我們問題。我們會給一個看法，不是制式簡報。",
+      fields: {
+        name: "姓名",
+        company: "公司 / 單位",
+        email: "Email",
+        phone: "電話",
+        interest: "想了解的服務",
+        message: "專案需求描述",
+        budget: "預算範圍 (選填)",
+        timeline: "預計導入時間 (選填)",
+        haveData: "是否已有資料或影像",
+        notes: "其他補充",
+        submit: "送出詢問",
+        sending: "送出中…",
+        sent: "已收到。兩個工作日內聯繫。",
+        required: "必填",
+        invalidEmail: "請輸入有效 Email",
+      },
+      interestOptions: [
+        "模型訓練與開發",
+        "影像辨識 / 機器視覺",
+        "邊緣 AI 系統",
+        "RAG 知識庫",
+        "部署與整合",
+        "尚未確定",
+      ],
+      haveOptions: ["有", "部分有", "沒有", "需討論"],
+    },
+    footer: {
+      tagline: "Taipei, Taiwan",
+      copy: "© 2026 EntroVi Ltd. 版權所有。",
+      contactLine: "yen@entrovi.com",
+    },
+  },
+};
+window.I18N = I18N;
+</script>
+
+<script type="text/babel">
+// tweaks-panel.jsx
+const __TWEAKS_STYLE = `
+  .twk-panel{position:fixed;right:16px;bottom:16px;z-index:2147483646;width:280px;
+    max-height:calc(100vh - 32px);display:flex;flex-direction:column;
+    background:rgba(250,249,247,.78);color:#29261b;
+    -webkit-backdrop-filter:blur(24px) saturate(160%);backdrop-filter:blur(24px) saturate(160%);
+    border:.5px solid rgba(255,255,255,.6);border-radius:14px;
+    box-shadow:0 1px 0 rgba(255,255,255,.5) inset,0 12px 40px rgba(0,0,0,.18);
+    font:11.5px/1.4 ui-sans-serif,system-ui,-apple-system,sans-serif;overflow:hidden}
+  .twk-hd{display:flex;align-items:center;justify-content:space-between;
+    padding:10px 8px 10px 14px;cursor:move;user-select:none}
+  .twk-hd b{font-size:12px;font-weight:600;letter-spacing:.01em}
+  .twk-x{appearance:none;border:0;background:transparent;color:rgba(41,38,27,.55);
+    width:22px;height:22px;border-radius:6px;cursor:default;font-size:13px;line-height:1}
+  .twk-x:hover{background:rgba(0,0,0,.06);color:#29261b}
+  .twk-body{padding:2px 14px 14px;display:flex;flex-direction:column;gap:10px;
+    overflow-y:auto;overflow-x:hidden;min-height:0;
+    scrollbar-width:thin;scrollbar-color:rgba(0,0,0,.15) transparent}
+  .twk-body::-webkit-scrollbar{width:8px}
+  .twk-body::-webkit-scrollbar-track{background:transparent;margin:2px}
+  .twk-body::-webkit-scrollbar-thumb{background:rgba(0,0,0,.15);border-radius:4px;
+    border:2px solid transparent;background-clip:content-box}
+  .twk-body::-webkit-scrollbar-thumb:hover{background:rgba(0,0,0,.25);
+    border:2px solid transparent;background-clip:content-box}
+  .twk-row{display:flex;flex-direction:column;gap:5px}
+  .twk-row-h{flex-direction:row;align-items:center;justify-content:space-between;gap:10px}
+  .twk-lbl{display:flex;justify-content:space-between;align-items:baseline;
+    color:rgba(41,38,27,.72)}
+  .twk-lbl>span:first-child{font-weight:500}
+  .twk-val{color:rgba(41,38,27,.5);font-variant-numeric:tabular-nums}
+  .twk-sect{font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;
+    color:rgba(41,38,27,.45);padding:10px 0 0}
+  .twk-sect:first-child{padding-top:0}
+  .twk-field{appearance:none;width:100%;height:26px;padding:0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;
+    background:rgba(255,255,255,.6);color:inherit;font:inherit;outline:none}
+  .twk-field:focus{border-color:rgba(0,0,0,.25);background:rgba(255,255,255,.85)}
+  select.twk-field{padding-right:22px;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'><path fill='rgba(0,0,0,.5)' d='M0 0h10L5 6z'/></svg>");
+    background-repeat:no-repeat;background-position:right 8px center}
+  .twk-slider{appearance:none;-webkit-appearance:none;width:100%;height:4px;margin:6px 0;
+    border-radius:999px;background:rgba(0,0,0,.12);outline:none}
+  .twk-slider::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;
+    width:14px;height:14px;border-radius:50%;background:#fff;
+    border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+  .twk-slider::-moz-range-thumb{width:14px;height:14px;border-radius:50%;
+    background:#fff;border:.5px solid rgba(0,0,0,.12);box-shadow:0 1px 3px rgba(0,0,0,.2);cursor:default}
+  .twk-seg{position:relative;display:flex;padding:2px;border-radius:8px;
+    background:rgba(0,0,0,.06);user-select:none}
+  .twk-seg-thumb{position:absolute;top:2px;bottom:2px;border-radius:6px;
+    background:rgba(255,255,255,.9);box-shadow:0 1px 2px rgba(0,0,0,.12);
+    transition:left .15s cubic-bezier(.3,.7,.4,1),width .15s}
+  .twk-seg.dragging .twk-seg-thumb{transition:none}
+  .twk-seg button{appearance:none;position:relative;z-index:1;flex:1;border:0;
+    background:transparent;color:inherit;font:inherit;font-weight:500;min-height:22px;
+    border-radius:6px;cursor:default;padding:4px 6px;line-height:1.2;
+    overflow-wrap:anywhere}
+  .twk-toggle{position:relative;width:32px;height:18px;border:0;border-radius:999px;
+    background:rgba(0,0,0,.15);transition:background .15s;cursor:default;padding:0}
+  .twk-toggle[data-on="1"]{background:#34c759}
+  .twk-toggle i{position:absolute;top:2px;left:2px;width:14px;height:14px;border-radius:50%;
+    background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.25);transition:transform .15s}
+  .twk-toggle[data-on="1"] i{transform:translateX(14px)}
+  .twk-num{display:flex;align-items:center;height:26px;padding:0 0 0 8px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:7px;background:rgba(255,255,255,.6)}
+  .twk-num-lbl{font-weight:500;color:rgba(41,38,27,.6);cursor:ew-resize;
+    user-select:none;padding-right:8px}
+  .twk-num input{flex:1;min-width:0;height:100%;border:0;background:transparent;
+    font:inherit;font-variant-numeric:tabular-nums;text-align:right;padding:0 8px 0 0;
+    outline:none;color:inherit;-moz-appearance:textfield}
+  .twk-num input::-webkit-inner-spin-button,.twk-num input::-webkit-outer-spin-button{
+    -webkit-appearance:none;margin:0}
+  .twk-num-unit{padding-right:8px;color:rgba(41,38,27,.45)}
+  .twk-btn{appearance:none;height:26px;padding:0 12px;border:0;border-radius:7px;
+    background:rgba(0,0,0,.78);color:#fff;font:inherit;font-weight:500;cursor:default}
+  .twk-btn:hover{background:rgba(0,0,0,.88)}
+  .twk-btn.secondary{background:rgba(0,0,0,.06);color:inherit}
+  .twk-btn.secondary:hover{background:rgba(0,0,0,.1)}
+  .twk-swatch{appearance:none;-webkit-appearance:none;width:56px;height:22px;
+    border:.5px solid rgba(0,0,0,.1);border-radius:6px;padding:0;cursor:default;
+    background:transparent;flex-shrink:0}
+  .twk-swatch::-webkit-color-swatch-wrapper{padding:0}
+  .twk-swatch::-webkit-color-swatch{border:0;border-radius:5.5px}
+  .twk-swatch::-moz-color-swatch{border:0;border-radius:5.5px}
+`;
+
+function useTweaks(defaults) {
+  const [values, setValues] = React.useState(defaults);
+  const setTweak = React.useCallback((keyOrEdits, val) => {
+    const edits = typeof keyOrEdits === 'object' && keyOrEdits !== null
+      ? keyOrEdits : { [keyOrEdits]: val };
+    setValues((prev) => ({ ...prev, ...edits }));
+  }, []);
+  return [values, setTweak];
+}
+
+function TweaksPanel({ title = 'Tweaks', children }) {
+  const [open, setOpen] = React.useState(false);
+  const dragRef = React.useRef(null);
+  const offsetRef = React.useRef({ x: 16, y: 16 });
+  const PAD = 16;
+
+  const clampToViewport = React.useCallback(() => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const w = panel.offsetWidth, h = panel.offsetHeight;
+    const maxRight = Math.max(PAD, window.innerWidth - w - PAD);
+    const maxBottom = Math.max(PAD, window.innerHeight - h - PAD);
+    offsetRef.current = {
+      x: Math.min(maxRight, Math.max(PAD, offsetRef.current.x)),
+      y: Math.min(maxBottom, Math.max(PAD, offsetRef.current.y)),
+    };
+    panel.style.right = offsetRef.current.x + 'px';
+    panel.style.bottom = offsetRef.current.y + 'px';
+  }, []);
+
+  React.useEffect(() => {
+    if (!open) return;
+    clampToViewport();
+    if (typeof ResizeObserver === 'undefined') {
+      window.addEventListener('resize', clampToViewport);
+      return () => window.removeEventListener('resize', clampToViewport);
+    }
+    const ro = new ResizeObserver(clampToViewport);
+    ro.observe(document.documentElement);
+    return () => ro.disconnect();
+  }, [open, clampToViewport]);
+
+  const dismiss = () => setOpen(false);
+
+  const onDragStart = (e) => {
+    const panel = dragRef.current;
+    if (!panel) return;
+    const r = panel.getBoundingClientRect();
+    const sx = e.clientX, sy = e.clientY;
+    const startRight = window.innerWidth - r.right;
+    const startBottom = window.innerHeight - r.bottom;
+    const move = (ev) => {
+      offsetRef.current = {
+        x: startRight - (ev.clientX - sx),
+        y: startBottom - (ev.clientY - sy),
+      };
+      clampToViewport();
+    };
+    const up = () => {
+      window.removeEventListener('mousemove', move);
+      window.removeEventListener('mouseup', up);
+    };
+    window.addEventListener('mousemove', move);
+    window.addEventListener('mouseup', up);
+  };
+
+  if (!open) return null;
+  return (
+    <>
+      <style>{__TWEAKS_STYLE}</style>
+      <div ref={dragRef} className="twk-panel" style={{ right: offsetRef.current.x, bottom: offsetRef.current.y }}>
+        <div className="twk-hd" onMouseDown={onDragStart}>
+          <b>{title}</b>
+          <button className="twk-x" onMouseDown={(e) => e.stopPropagation()} onClick={dismiss}>✕</button>
+        </div>
+        <div className="twk-body">{children}</div>
+      </div>
+    </>
+  );
+}
+
+function TweakSection({ label, children }) {
+  return (
+    <>
+      <div className="twk-sect">{label}</div>
+      {children}
+    </>
+  );
+}
+
+function TweakRow({ label, value, children }) {
+  return (
+    <div className="twk-row">
+      <div className="twk-lbl">
+        <span>{label}</span>
+        {value != null && <span className="twk-val">{value}</span>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function TweakSlider({ label, value, min = 0, max = 100, step = 1, unit = '', onChange }) {
+  return (
+    <TweakRow label={label} value={`${value}${unit}`}>
+      <input type="range" className="twk-slider" min={min} max={max} step={step}
+             value={value} onChange={(e) => onChange(Number(e.target.value))} />
+    </TweakRow>
+  );
+}
+
+function TweakToggle({ label, value, onChange }) {
+  return (
+    <div className="twk-row twk-row-h">
+      <div className="twk-lbl"><span>{label}</span></div>
+      <button type="button" className="twk-toggle" data-on={value ? '1' : '0'}
+              onClick={() => onChange(!value)}><i /></button>
+    </div>
+  );
+}
+
+function TweakRadio({ label, value, options, onChange }) {
+  const trackRef = React.useRef(null);
+  const [dragging, setDragging] = React.useState(false);
+  const opts = options.map((o) => (typeof o === 'object' ? o : { value: o, label: o }));
+  const idx = Math.max(0, opts.findIndex((o) => o.value === value));
+  const n = opts.length;
+  const valueRef = React.useRef(value);
+  valueRef.current = value;
+
+  const segAt = (clientX) => {
+    const r = trackRef.current.getBoundingClientRect();
+    const inner = r.width - 4;
+    const i = Math.floor(((clientX - r.left - 2) / inner) * n);
+    return opts[Math.max(0, Math.min(n - 1, i))].value;
+  };
+
+  const onPointerDown = (e) => {
+    setDragging(true);
+    const v0 = segAt(e.clientX);
+    if (v0 !== valueRef.current) onChange(v0);
+    const move = (ev) => {
+      if (!trackRef.current) return;
+      const v = segAt(ev.clientX);
+      if (v !== valueRef.current) onChange(v);
+    };
+    const up = () => {
+      setDragging(false);
+      window.removeEventListener('pointermove', move);
+      window.removeEventListener('pointerup', up);
+    };
+    window.addEventListener('pointermove', move);
+    window.addEventListener('pointerup', up);
+  };
+
+  return (
+    <TweakRow label={label}>
+      <div ref={trackRef} onPointerDown={onPointerDown} className={dragging ? 'twk-seg dragging' : 'twk-seg'}>
+        <div className="twk-seg-thumb" style={{ left: `calc(2px + ${idx} * (100% - 4px) / ${n})`, width: `calc((100% - 4px) / ${n})` }} />
+        {opts.map((o) => (
+          <button key={o.value} type="button">{o.label}</button>
+        ))}
+      </div>
+    </TweakRow>
+  );
+}
+
+Object.assign(window, { useTweaks, TweaksPanel, TweakSection, TweakRow, TweakSlider, TweakToggle, TweakRadio });
+</script>
+
+<script type="text/babel">
+// sections.jsx — Section components
+
+function Hero({ t }) {
+  const [displayText, setDisplayText] = React.useState('');
+  const hasCompletedRef = React.useRef(false);
+  const sentenceRef = React.useRef('');
+
+  // Full sentence
+  sentenceRef.current = t.lang === 'zh'
+    ? 'EntroVi 填補你 AI 落地的空白。\n我們解決真正問題：\n 你不知道你不知道什麼。'
+    : 'EntroVi fills the blank of your overwhelmed gap of AI in your Business.\nWe fix the true issue,\n you don\'t know what you don\'t know.';
+
+  React.useEffect(() => {
+    // Skip if already completed
+    if (hasCompletedRef.current) return;
+
+    const typingSpeed = 50; // 50ms per character
+    let currentIndex = 0;
+
+    const type = () => {
+      if (currentIndex < sentenceRef.current.length - 1) {
+        currentIndex++;
+        setDisplayText(sentenceRef.current.substring(0, currentIndex));
+        setTimeout(type, typingSpeed);
+      } else {
+        // Finished typing, mark as completed
+        setDisplayText(sentenceRef.current);
+        hasCompletedRef.current = true;
+      }
+    };
+
+    // Start with first character
+    setDisplayText(sentenceRef.current.substring(0, 1));
+    const timeoutId = setTimeout(type, typingSpeed);
+
+    return () => clearTimeout(timeoutId);
+  }, []);
+
+  return (
+    <section className="ev-section ev-hero" id="top">
+      <div className="ev-container">
+        <div className="ev-hero-grid-layout">
+          <div className="ev-hero-content">
+            <div className="ev-hero-eyebrow">
+              <span className="ev-dot" />
+              <span>{t.hero.eyebrow}</span>
+            </div>
+            <h1 className="ev-hero-title">
+              <span className="ev-hero-title-line">Build. Train. Deploy.</span>
+              <span className="ev-hero-title-line">AI Solutions,</span>
+              <span className="ev-hero-title-line">End to End.</span>
+            </h1>
+            <div className="ev-hero-actions" style={{ marginTop: '40px' }}>
+              <a href="contact.html" className="ev-btn ev-btn-primary">
+                <span>{t.hero.cta1}</span>
+                <span className="ev-btn-arrow">→</span>
+              </a>
+              <a href="#services" className="ev-btn ev-btn-ghost">
+                <span>{t.hero.cta2}</span>
+              </a>
+            </div>
+          </div>
+          <div className="ev-hero-visual-wrap">
+            <div className="ev-hero-visual">
+              <div className="ev-terminal">
+                <div className="ev-terminal-header">
+                  <span className="ev-terminal-dot red" />
+                  <span className="ev-terminal-dot yellow" />
+                  <span className="ev-terminal-dot green" />
+                  <span className="ev-terminal-title">entrovi@server:~</span>
+                </div>
+                <div className="ev-terminal-body">
+                  <div className="ev-terminal-line">
+                    <span className="ev-terminal-prompt">➜</span>
+                    <span className="ev-terminal-command">./entrovi-init.sh</span>
+                  </div>
+                  <div className="ev-terminal-output">
+                    Loading AI engineering modules...
+                  </div>
+                  <div className="ev-terminal-line">
+                    <span className="ev-terminal-prompt">➜</span>
+                    <span className="ev-terminal-command">
+                      {displayText}
+                      <span className="ev-terminal-cursor" />
+                    </span>
+                  </div>
+                  <div className="ev-terminal-output" style={{ marginTop: '16px' }}>
+                    ✓ System ready<br />
+                    ✓ Connected to production environment
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Services({ t }) {
+  const [active, setActive] = React.useState(null);
+  const gridRef = React.useRef(null);
+
+  const handleMouseMove = (e) => {
+    const card = e.currentTarget;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    card.style.setProperty('--mouse-x', `${(x / rect.width) * 100}%`);
+    card.style.setProperty('--mouse-y', `${(y / rect.height) * 100}%`);
+  };
+
+  return (
+    <section className="ev-section" id="services">
+      <div className="ev-container">
+        <SectionHeader kicker={t.services.kicker} title={t.services.title} sub={t.services.sub} />
+        <div className="ev-services-grid" ref={gridRef}>
+          {t.services.items.map((it, i) => (
+            <article key={it.id} className="ev-service-card"
+                     onMouseEnter={() => setActive(i)}
+                     onMouseLeave={() => setActive(null)}
+                     onMouseMove={handleMouseMove}>
+              <div className="ev-service-card-inner" />
+              <div className="ev-service-head">
+                <span className="ev-service-arrow">↗</span>
+              </div>
+              <h3 className="ev-service-name">{it.name}</h3>
+              <p className="ev-service-desc">{it.desc}</p>
+              <div className="ev-service-meta">
+                <div className="ev-service-meta-row">
+                  <span className="ev-service-meta-label">FIT</span>
+                  <span className="ev-service-meta-val">{it.fit}</span>
+                </div>
+                <div className="ev-service-meta-row">
+                  <span className="ev-service-meta-label">DELIVER</span>
+                  <ul className="ev-service-deliver">{it.deliver.map((d, j) => <li key={j}>{d}</li>)}</ul>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Process({ t }) {
+  return (
+    <section className="ev-section" id="process">
+      <div className="ev-container">
+        <SectionHeader kicker={t.process.kicker} title={t.process.title} sub={t.process.sub} />
+        <div className="ev-process-track">
+          {t.process.steps.map((s) => (
+            <div className="ev-process-step" key={s.n}>
+              <div className="ev-process-step-content">
+                <div className="ev-process-step-head">
+                  <span className="ev-process-num">{s.n}</span>
+                  <span className="ev-process-tick" />
+                </div>
+                <h4 className="ev-process-t">{s.t}</h4>
+                <p className="ev-process-d">{s.d}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Why({ t }) {
+  return (
+    <section className="ev-section" id="why">
+      <div className="ev-container">
+        <SectionHeader kicker={t.why.kicker} title={t.why.title} />
+        <div className="ev-why-grid">
+          {t.why.points.map((p, i) => (
+            <div className="ev-why-item" key={i}>
+              <span className="ev-why-num">{String(i + 1).padStart(2, "0")}</span>
+              <h4 className="ev-why-t">{p.t}</h4>
+              <p className="ev-why-d">{p.d}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function SectionHeader({ kicker, title, sub, compact }) {
+  return (
+    <header className={`ev-sec-head ${compact ? "is-compact" : ""}`}>
+      <div className="ev-kicker">{kicker}</div>
+      <h2 className="ev-sec-title">{title}</h2>
+      {sub && <p className="ev-sec-sub">{sub}</p>}
+    </header>
+  );
+}
+</script>
+
+<script type="text/babel">
+// chrome.jsx — Contact form, nav, footer
+
+function Nav({ t, lang, onLang, onScrollTo }) {
+  const [scrolled, setScrolled] = React.useState(false);
+  const [open, setOpen] = React.useState(false);
+
+  React.useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 12);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    onScroll();
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const links = [
+    { id: "services", label: t.nav.services },
+    { id: "process", label: t.nav.process },
+    { id: "why", label: t.nav.why }
+  ];
+
+  return (
+    <nav className={`ev-nav ${scrolled ? "is-scrolled" : ""}`}>
+      <div className="ev-nav-inner">
+        <a href="#top" className="ev-logo" aria-label="EntroVi home">
+          <img src="entrovi-logo.png" alt="EntroVi" style={{ width: 90, height: 90, objectFit: 'contain', marginLeft: '8px' }} />
+        </a>
+        <ul className="ev-nav-links">
+          {links.map((l) => (
+            <li key={l.id}>
+              <a href={`#${l.id}`} onClick={(e) => { e.preventDefault(); onScrollTo(l.id); }}>
+                {l.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <div className="ev-nav-right">
+          <div className="ev-lang">
+            <button className={`ev-lang-btn ${lang === "en" ? "is-active" : ""}`} onClick={() => onLang("en")} aria-pressed={lang === "en"}>EN</button>
+            <span className="ev-lang-sep">/</span>
+            <button className={`ev-lang-btn ${lang === "zh" ? "is-active" : ""}`} onClick={() => onLang("zh")} aria-pressed={lang === "zh"}>中</button>
+          </div>
+          <button className={`ev-burger ${open ? "is-open" : ""}`} onClick={() => setOpen((o) => !o)} aria-label="Toggle menu">
+            <span></span><span></span>
+          </button>
+        </div>
+      </div>
+      {open && (
+        <div className="ev-nav-mobile">
+          {links.map((l) => (
+            <a key={l.id} href={`#${l.id}`} onClick={(e) => { e.preventDefault(); setOpen(false); onScrollTo(l.id); }}>
+              {l.label}
+            </a>
+          ))}
+        </div>
+      )}
+    </nav>
+  );
+}
+
+function Contact({ t }) {
+  const f = t.contact.fields;
+  const [vals, setVals] = React.useState({
+    name: "", company: "", email: "", phone: "",
+    interest: "", message: "", budget: "", timeline: "", haveData: "", notes: ""
+  });
+  const [errors, setErrors] = React.useState({});
+  const [status, setStatus] = React.useState("idle");
+
+  const update = (k, v) => {
+    setVals((s) => ({ ...s, [k]: v }));
+    if (errors[k]) setErrors((e) => { const n = { ...e }; delete n[k]; return n; });
+  };
+
+  const validate = () => {
+    const e = {};
+    if (!vals.name.trim()) e.name = f.required;
+    if (!vals.email.trim()) e.email = f.required;
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(vals.email)) e.email = f.invalidEmail;
+    if (!vals.message.trim()) e.message = f.required;
+    return e;
+  };
+
+  const submit = (ev) => {
+    ev.preventDefault();
+    const e = validate();
+    setErrors(e);
+    if (Object.keys(e).length) return;
+    setStatus("sending");
+    setTimeout(() => setStatus("sent"), 900);
+  };
+
+  if (status === "sent") {
+    return (
+      <section className="ev-section" id="contact">
+        <div className="ev-container">
+          <div className="ev-contact-success">
+            <div className="ev-kicker">{t.contact.kicker}</div>
+            <div className="ev-success-mark">
+              <svg viewBox="0 0 48 48" width="48" height="48">
+                <path d="M10 25 L20 35 L38 14" fill="none" stroke="currentColor" strokeWidth="1.5" />
+              </svg>
+            </div>
+            <h2 className="ev-sec-title">{f.sent}</h2>
+            <p className="ev-sec-sub">{t.footer.contactLine}</p>
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="ev-section" id="contact">
+      <div className="ev-container">
+        <div className="ev-contact-grid">
+          <div>
+            <header className="ev-sec-head is-compact">
+              <div className="ev-kicker">{t.contact.kicker}</div>
+              <h2 className="ev-sec-title" style={{ color: 'var(--ev-accent)' }}>{t.contact.title}</h2>
+              {t.contact.sub && <p className="ev-sec-sub">{t.contact.sub}</p>}
+            </header>
+            <ul className="ev-contact-meta">
+              <li>
+                <span className="ev-meta-l">EMAIL</span>
+                <span className="ev-meta-v">{t.footer.contactLine}</span>
+              </li>
+              <li>
+                <span className="ev-meta-l">LOCATION</span>
+                <span className="ev-meta-v">
+                  <span>Taipei, Taiwan</span>
+                  <br />
+                  <span>14 F.-1 NO.415, Sec.4 Xinyi RD., Xinyi Dist</span>
+                </span>
+              </li>
+              <li>
+                <span className="ev-meta-l"></span>
+                <span className="ev-meta-v">≤ 2 business days</span>
+              </li>
+            </ul>
+          </div>
+          <form className="ev-form" onSubmit={submit} noValidate>
+            <div className="ev-form-row two">
+              <Field label={f.name} required err={errors.name}>
+                <input type="text" value={vals.name} onChange={(e) => update("name", e.target.value)} />
+              </Field>
+              <Field label={f.company}>
+                <input type="text" value={vals.company} onChange={(e) => update("company", e.target.value)} />
+              </Field>
+            </div>
+            <div className="ev-form-row two">
+              <Field label={f.email} required err={errors.email}>
+                <input type="email" value={vals.email} onChange={(e) => update("email", e.target.value)} />
+              </Field>
+              <Field label={f.phone}>
+                <input type="tel" value={vals.phone} onChange={(e) => update("phone", e.target.value)} />
+              </Field>
+            </div>
+            <Field label={f.interest}>
+              <select value={vals.interest} onChange={(e) => update("interest", e.target.value)}>
+                <option value="">—</option>
+                {t.contact.interestOptions.map((o) => <option key={o} value={o}>{o}</option>)}
+              </select>
+            </Field>
+            <Field label={f.message} required err={errors.message}>
+              <textarea rows="5" value={vals.message} onChange={(e) => update("message", e.target.value)} />
+            </Field>
+            <details className="ev-form-more">
+              <summary>+ {t.contact.fields.notes} / {t.contact.fields.budget} / {t.contact.fields.timeline}</summary>
+              <div className="ev-form-row two">
+                <Field label={f.budget}>
+                  <input type="text" value={vals.budget} onChange={(e) => update("budget", e.target.value)} />
+                </Field>
+                <Field label={f.timeline}>
+                  <input type="text" value={vals.timeline} onChange={(e) => update("timeline", e.target.value)} />
+                </Field>
+              </div>
+              <Field label={f.haveData}>
+                <div className="ev-radio-row">
+                  {t.contact.haveOptions.map((o) => (
+                    <label key={o} className={`ev-radio ${vals.haveData === o ? "is-on" : ""}`}>
+                      <input type="radio" name="haveData" value={o} checked={vals.haveData === o} onChange={(e) => update("haveData", e.target.value)} />
+                      <span>{o}</span>
+                    </label>
+                  ))}
+                </div>
+              </Field>
+              <Field label={f.notes}>
+                <textarea rows="3" value={vals.notes} onChange={(e) => update("notes", e.target.value)} />
+              </Field>
+            </details>
+            <div className="ev-form-submit">
+              <button type="submit" className="ev-btn ev-btn-primary ev-btn-lg" disabled={status === "sending"}>
+                <span>{status === "sending" ? f.sending : f.submit}</span>
+                <span className="ev-btn-arrow">→</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function Field({ label, required, err, children }) {
+  return (
+    <label className={`ev-field ${err ? "has-err" : ""}`}>
+      <span className="ev-field-l">
+        {label}{required && <span className="ev-req">*</span>}
+        {err && <span className="ev-err">{err}</span>}
+      </span>
+      {children}
+    </label>
+  );
+}
+
+function Footer({ t }) {
+  return (
+    <footer className="ev-footer">
+      <div className="ev-container">
+        <div className="ev-footer-top">
+          <div>
+            <img src="entrovi-logo.png" alt="EntroVi" style={{ width: 96, height: 96, objectFit: 'contain' }} />
+            <p className="ev-footer-tag">{t.footer.tagline}</p>
+          </div>
+          <div className="ev-footer-contact">
+            <div className="ev-footer-contact-row">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ marginRight: '8px', color: 'var(--ev-accent)' }}>
+                <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z" />
+                <circle cx="12" cy="10" r="3" />
+              </svg>
+              <span>Taipei, Taiwan</span>
+            </div>
+            <div className="ev-footer-contact-row">
+              <span>14 F.-1 NO.415, Sec.4 Xinyi RD., Xinyi Dist</span>
+            </div>
+          </div>
+        </div>
+        <div className="ev-footer-bottom">
+          <span>{t.footer.copy}</span>
+          <span>v0.1</span>
+        </div>
+      </div>
+    </footer>
+  );
+}
+</script>
+
+<script type="text/babel">
+const TWEAK_DEFAULTS = {
+  "accent": "mono",
+  "typography": "inter",
+  "lang": "en"
+};
+
+const ACCENTS = {
+  mono:    { bg: "#08090b", bg2: "#0d0f12", bg3: "#14171c", fg: "#f5f5f4", line: "rgba(255,255,255,0.08)", line2: "rgba(255,255,255,0.14)" },
+  glacier: { bg: "#06090f", bg2: "#0b1018", bg3: "#11192a", fg: "#e6f0ff", line: "rgba(160,200,255,0.10)", line2: "rgba(160,200,255,0.18)" },
+  carbon:  { bg: "#0a0a0a", bg2: "#121212", bg3: "#1a1a1a", fg: "#fafafa", line: "rgba(255,255,255,0.07)", line2: "rgba(255,255,255,0.12)" },
+  warm:    { bg: "#0c0a08", bg2: "#13110e", bg3: "#1b1814", fg: "#f5efe6", line: "rgba(245,239,230,0.08)", line2: "rgba(245,239,230,0.14)" },
+};
+
+function applyAccent(name) {
+  const a = ACCENTS[name] || ACCENTS.mono;
+  const r = document.documentElement;
+  r.style.setProperty("--ev-bg", a.bg);
+  r.style.setProperty("--ev-bg-2", a.bg2);
+  r.style.setProperty("--ev-bg-3", a.bg3);
+  r.style.setProperty("--ev-fg", a.fg);
+  r.style.setProperty("--ev-line", a.line);
+  r.style.setProperty("--ev-line-2", a.line2);
+}
+
+function App() {
+  const [tweaks, setTweak] = useTweaks(TWEAK_DEFAULTS);
+  const lang = tweaks.lang || "en";
+  const t = window.I18N[lang];
+
+  React.useEffect(() => { applyAccent(tweaks.accent); }, [tweaks.accent]);
+  React.useEffect(() => { document.body.dataset.typo = tweaks.typography; }, [tweaks.typography]);
+  React.useEffect(() => { document.documentElement.lang = lang === "zh" ? "zh-Hant" : "en"; }, [lang]);
+
+  const scrollTo = (id) => {
+    if (id === 'contact') {
+      window.location.href = 'contact.html';
+    } else {
+      const el = document.getElementById(id);
+      if (el) {
+        const y = el.getBoundingClientRect().top + window.scrollY - 60;
+        window.scrollTo({ top: y, behavior: "smooth" });
+      }
+    }
+  };
+
+  return (
+    <React.Fragment>
+      <Nav t={t} lang={lang} onLang={(l) => setTweak("lang", l)} onScrollTo={scrollTo} />
+      <main style={{ position: 'relative', zIndex: 1 }}>
+        <Hero t={t} />
+        <Services t={t} />
+        <Process t={t} />
+        <Why t={t} />
+      </main>
+      <Footer t={t} />
+
+      <TweaksPanel title="Tweaks">
+        <TweakSection title="Accent">
+          <TweakRadio
+            value={tweaks.accent}
+            onChange={(v) => setTweak("accent", v)}
+            options={[
+              { value: "mono", label: "Mono" },
+              { value: "carbon", label: "Carbon" },
+              { value: "glacier", label: "Glacier" },
+              { value: "warm", label: "Warm" },
+            ]}
+          />
+        </TweakSection>
+
+        <TweakSection title="Typography">
+          <TweakRadio
+            value={tweaks.typography}
+            onChange={(v) => setTweak("typography", v)}
+            options={[
+              { value: "inter", label: "Inter" },
+              { value: "grotesk", label: "Grotesk" },
+              { value: "serif", label: "Serif" },
+              { value: "mono", label: "Mono" },
+            ]}
+          />
+        </TweakSection>
+
+        <TweakSection title="Language">
+          <TweakRadio
+            value={lang}
+            onChange={(v) => setTweak("lang", v)}
+            options={[
+              { value: "en", label: "English" },
+              { value: "zh", label: "中文" },
+            ]}
+          />
+        </TweakSection>
+      </TweaksPanel>
+    </React.Fragment>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+
+</body>
+</html>
